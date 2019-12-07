@@ -1,0 +1,65 @@
+{ "frames": [
+   {
+    "filename": "David 0.aseprite",
+    "frame": { "x": 0, "y": 0, "w": 31, "h": 50 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 31, "h": 50 },
+    "sourceSize": { "w": 31, "h": 50 },
+    "duration": 100
+   },
+   {
+    "filename": "David 1.aseprite",
+    "frame": { "x": 31, "y": 0, "w": 31, "h": 50 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 31, "h": 50 },
+    "sourceSize": { "w": 31, "h": 50 },
+    "duration": 100
+   },
+   {
+    "filename": "David 2.aseprite",
+    "frame": { "x": 62, "y": 0, "w": 31, "h": 50 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 31, "h": 50 },
+    "sourceSize": { "w": 31, "h": 50 },
+    "duration": 100
+   },
+   {
+    "filename": "David 3.aseprite",
+    "frame": { "x": 93, "y": 0, "w": 31, "h": 50 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 31, "h": 50 },
+    "sourceSize": { "w": 31, "h": 50 },
+    "duration": 100
+   },
+   {
+    "filename": "David 4.aseprite",
+    "frame": { "x": 124, "y": 0, "w": 31, "h": 50 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 31, "h": 50 },
+    "sourceSize": { "w": 31, "h": 50 },
+    "duration": 100
+   }
+ ],
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.13-x64",
+  "image": "David.png",
+  "format": "RGBA8888",
+  "size": { "w": 155, "h": 50 },
+  "scale": "1",
+  "frameTags": [
+   { "name": "Walk", "from": 0, "to": 2, "direction": "forward" },
+   { "name": "Jump", "from": 3, "to": 4, "direction": "forward" }
+  ],
+  "layers": [
+   { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}

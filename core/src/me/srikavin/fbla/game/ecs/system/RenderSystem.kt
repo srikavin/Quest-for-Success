@@ -1,0 +1,30 @@
+package me.srikavin.fbla.game.ecs.system
+
+import com.artemis.BaseSystem
+import com.artemis.annotations.Wire
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import ktx.log.info
+
+
+class RenderSystem : BaseSystem() {
+
+    @Wire
+    lateinit var camera: OrthographicCamera
+    @Wire
+    lateinit var batch: SpriteBatch
+
+    override fun processSystem() {
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        camera.update()
+        batch.projectionMatrix = camera.combined
+    }
+
+    override fun dispose() {
+        super.dispose()
+        batch.dispose()
+    }
+}
