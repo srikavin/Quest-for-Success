@@ -22,9 +22,4 @@ jobs:
       with:
         file: "./desktop/build/libs/desktop-1.0.jar"
         prerelease: true
-    - name: Post to Discord
-      uses: appleboy/discord-action@master
-      with:
-        webhook_id: ${{ secrets.WEBHOOK_ID }}
-        webhook_token: ${{ secrets.WEBHOOK_TOKEN }}
-        message: New Release at ${{ steps.upload_release.outputs.release_url }}
+        draft: false
