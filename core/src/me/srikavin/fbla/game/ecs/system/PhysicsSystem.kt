@@ -8,12 +8,8 @@ import com.artemis.systems.IteratingSystem
 import com.artemis.utils.IntBag
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import ktx.collections.GdxArray
-import ktx.collections.gdxArrayOf
-import ktx.log.info
 import me.srikavin.fbla.game.ecs.component.FixedRotation
 import me.srikavin.fbla.game.ecs.component.PhysicsBody
 import me.srikavin.fbla.game.ecs.component.Transform
@@ -29,7 +25,7 @@ class PhysicsSystem(var physicsWorld: World) : IteratingSystem() {
         getSubscription().addSubscriptionListener(SubscriptionListener())
     }
 
-    inner class SubscriptionListener : EntitySubscription.SubscriptionListener {
+    private inner class SubscriptionListener : EntitySubscription.SubscriptionListener {
         override fun inserted(entities: IntBag) {
             for (i in 0 until entities.size()) {
                 val e = entities[i]
@@ -41,12 +37,13 @@ class PhysicsSystem(var physicsWorld: World) : IteratingSystem() {
                 val bodyDef = BodyDef().apply {
                     type = physics.type
                     position.set(transform.position)
+                    linearDamping = physics.linearDamping
                 }
                 physics.body = physicsWorld.createBody(bodyDef).apply {
                     userData = e
                 }
 
-                if (fixedRotationMapper.has(e)){
+                if (fixedRotationMapper.has(e)) {
                     physics.body.isFixedRotation = true
                 }
 
@@ -67,7 +64,6 @@ class PhysicsSystem(var physicsWorld: World) : IteratingSystem() {
 
                     fixtures.add(fixture)
                 } else {
-                    info { "123123" }
                     fixtures = GdxArray(false, physics.fixtureDefs.size)
 
                     for (fixtureDef in physics.fixtureDefs) {
@@ -83,6 +79,12 @@ class PhysicsSystem(var physicsWorld: World) : IteratingSystem() {
         }
 
         override fun removed(entities: IntBag) {
+            for (i in 0 until entities.size()) {
+                val e = entities[i]
+                val physics = physicsMapper[e]
+
+                physicsWorld.destroyBody(physics.body)
+            }
         }
     }
 

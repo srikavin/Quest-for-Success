@@ -7,12 +7,17 @@ import com.artemis.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector2
-import ktx.log.info
 import me.srikavin.fbla.game.Actions
 import me.srikavin.fbla.game.ecs.component.PhysicsBody
 import me.srikavin.fbla.game.ecs.component.PlayerControlled
 import me.srikavin.fbla.game.ecs.component.Transform
 import java.util.function.BiConsumer
+
+private const val JUMP_DELAY_SEC = 1.5f
+private const val MAX_HORIZONTAL_VELOCITY = 7f
+private val JUMP_IMPULSE = Vector2(0.0f, 15.0f)
+private val LEFT_FORCE = Vector2(-50f, 10.0f)
+private val RIGHT_FORCE = Vector2(50f, 10.0f)
 
 @All(PlayerControlled::class, PhysicsBody::class, Transform::class)
 class InputSystem : IteratingSystem() {
@@ -23,20 +28,36 @@ class InputSystem : IteratingSystem() {
     @Wire
     lateinit var camera: OrthographicCamera
 
-    val JUMP_IMPULSE = Vector2(0.0f, 1.0f)
-    val LEFT_IMPULSE = Vector2(-0.5f, 0.0f)
-    val RIGHT_IMPULSE = Vector2(0.5f, 0.0f)
+
+    var jumpDelay = 0f
 
     override fun process(entityId: Int) {
         val body = physicsBodyMapper[entityId].body
         val position = transformMapper[entityId].position
 
+        jumpDelay -= Gdx.graphics.deltaTime
+
         playerControlledMapper[entityId].bindings.bindings.forEach(BiConsumer { action, keyCode ->
             if (Gdx.input.isKeyPressed(keyCode)) {
                 when (action) {
-                    Actions.JUMP -> body.applyLinearImpulse(JUMP_IMPULSE, position, true)
-                    Actions.MOVE_LEFT -> body.applyLinearImpulse(LEFT_IMPULSE, position, true)
-                    Actions.MOVE_RIGHT -> body.applyLinearImpulse(RIGHT_IMPULSE, position, true)
+                    Actions.JUMP -> {
+                        if (jumpDelay < 0) {
+                            jumpDelay = JUMP_DELAY_SEC
+                        } else {
+                            return@BiConsumer
+                        }
+                        body.applyLinearImpulse(JUMP_IMPULSE, body.position, true)
+                    }
+                    Actions.MOVE_LEFT -> {
+                        if (body.linearVelocity.x > -MAX_HORIZONTAL_VELOCITY) {
+                            body.applyForceToCenter(LEFT_FORCE, true)
+                        }
+                    }
+                    Actions.MOVE_RIGHT -> {
+                        if (body.linearVelocity.x < MAX_HORIZONTAL_VELOCITY) {
+                            body.applyForceToCenter(RIGHT_FORCE, true)
+                        }
+                    }
                     Actions.USE -> TODO()
                 }
             }

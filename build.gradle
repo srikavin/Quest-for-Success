@@ -51,7 +51,7 @@ project(":desktop") {
 
 project(":core") {
     apply plugin: "kotlin"
-    ext.kotlinVersion = '1.3.60'
+    ext.kotlinVersion = '1.3.61'
     ext.ktxVersion = '1.9.10-b2'
 
     dependencies {
@@ -61,6 +61,8 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 
         compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+        compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3'
+
         compile "io.github.libktx:ktx-actors:$ktxVersion"
         compile "io.github.libktx:ktx-assets:$ktxVersion"
         compile "io.github.libktx:ktx-async:$ktxVersion"

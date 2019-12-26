@@ -6,9 +6,12 @@ import me.srikavin.fbla.game.FBLAGame;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.height = 720;
-		config.width = 1280;
-		new LwjglApplication(new FBLAGame(), config);
-	}
+        LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+        config.height = 1080;
+        config.width = 1920;
+//		config.foregroundFPS = 1000;
+//		config.vSyncEnabled = false;
+//		config.fullscreen = true;
+        new LwjglApplication(new FBLAGame(), config);
+    }
 }

@@ -16,9 +16,13 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.PolygonShape
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.ObjectMap
+import com.badlogic.gdx.utils.viewport.ExtendViewport
 import ktx.box2d.earthGravity
+import me.srikavin.fbla.game.dialogue.callable.DialogueMeeting
 import me.srikavin.fbla.game.ecs.component.*
 import me.srikavin.fbla.game.ecs.system.*
 import me.srikavin.fbla.game.graphics.SpritesheetLoader
@@ -42,7 +46,7 @@ class FBLAGame : ApplicationAdapter() {
         val batch = SpriteBatch()
         val spritesheetLoader = SpritesheetLoader()
 
-        val walkAnimation = spritesheetLoader.loadAsespriteSheet("David.png", "David.json", "Walk")
+        val playerAnimations = spritesheetLoader.loadAsespriteSheet("David.png", "David.json")
 
         val physicsWorld = com.badlogic.gdx.physics.box2d.World(earthGravity, true)
 
@@ -60,20 +64,36 @@ class FBLAGame : ApplicationAdapter() {
         assetManager.finishLoading()
         val skin: Skin = assetManager.get<Skin>("skin/skin.json")
 
+        val stage = Stage(ExtendViewport(640f, 480f))
+        val root = Table(skin)
+        stage.addActor(root)
+
+        root.setFillParent(true)
+        root.top().right()
+        root.debug = true
+
+
         val config = WorldConfigurationBuilder()
                 .with(InputSystem(),
                         PhysicsSystem(physicsWorld),
                         CameraFollowSystem(),
+                        PlayerAnimationSystem(),
                         RenderSystem(),
                         BackgroundRenderSystem(),
                         EntityRenderSystem(),
+                        MinigameRenderSystem(),
+                        DialogueSystem(),
                         UISystem(),
-                        PhysicsDebugSystem(physicsWorld))
+                        PhysicsDebugSystem(physicsWorld)
+                )
                 .with(TagManager())
                 .build()
                 .register(camera)
                 .register(batch)
                 .register(skin)
+                .register(stage)
+                .register(root)
+
         world = World(config)
 
         assetManager.setLoader(TiledMap::class.java, TmxMapLoader(InternalFileHandleResolver()))
@@ -85,16 +105,19 @@ class FBLAGame : ApplicationAdapter() {
                 .add(PhysicsBody().apply {
                     shape = PolygonShape().apply {
                         setAsBox(.6f, 1f)
-                    };
+                    }
                     restitution = 0f
-                    density = 1f;
+                    density = 1f
+                    friction = 0.2f
                 })
                 .add(PlayerControlled())
                 .add(SpriteOffset(Vector2(-.75f, -1f)))
                 .add(Transform().apply { position = Vector2(3f, 15f) })
-                .add(Animated().apply { animation = walkAnimation; looping = true })
+                .add(SwitchableAnimation().apply { animations = playerAnimations; currentState = "Stand" })
                 .add(FixedRotation())
                 .entity
+
+        world.createEntity().edit().add(DialogueComponent().apply { script = DialogueMeeting() })
 
         world.getSystem(TagManager::class.java).register("PLAYER", e)
     }
