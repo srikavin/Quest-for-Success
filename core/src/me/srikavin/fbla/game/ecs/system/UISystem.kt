@@ -39,7 +39,7 @@ class UISystem : BaseSystem() {
 
 
 //        cell.actor.setText("Velocty: ${bodyMapper[player].body.linearVelocity}")
-        fpsCell.actor.setText("FPS: ${Gdx.graphics.framesPerSecond}")
+        fpsCell.actor.setText("Position: ${tranformMapper[player].position}")
 
         stage.act(Gdx.graphics.deltaTime)
         stage.draw()

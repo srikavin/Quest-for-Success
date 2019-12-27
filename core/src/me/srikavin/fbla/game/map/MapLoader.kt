@@ -2,7 +2,10 @@ package me.srikavin.fbla.game.map
 
 import com.artemis.World
 import com.artemis.managers.TagManager
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.objects.EllipseMapObject
@@ -21,6 +24,7 @@ import me.srikavin.fbla.game.ecs.component.Map
 import me.srikavin.fbla.game.ecs.component.Transform
 import me.srikavin.fbla.game.ecs.system.CameraFollowSystem
 import me.srikavin.fbla.game.graphics.SpritesheetLoader
+import me.srikavin.fbla.game.trigger.TriggerType
 
 
 private const val COLLISION_LAYER_NAME = "Collision"
@@ -31,10 +35,12 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
     private val recycledVector2 = Vector2()
     private val spritesheetLoader = SpritesheetLoader()
     private val recycledFloatArray = FloatArray(6)
+    private val playerAnimations = spritesheetLoader.loadAsespriteSheet("assets/graphics/characters/David.png",
+            "assets/graphics/characters/David.json")
+    private val coinSprite: TextureRegion = TextureRegion(Texture(Gdx.files.internal("assets/graphics/entity/coinGold.png")))
+
 
     private fun createPlayer(pos: Vector2) {
-        val playerAnimations = spritesheetLoader.loadAsespriteSheet("assets/graphics/characters/David.png",
-                "assets/graphics/characters/David.json")
 
         world.getSystem(CameraFollowSystem::class.java).camera.position.y = pos.y + 5
 
@@ -55,6 +61,21 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
                 .entity
 
         world.getSystem(TagManager::class.java).register("PLAYER", e)
+    }
+
+    private fun createCoin(pos: Vector2) {
+        world.createEntity().edit()
+                .add(Transform().apply { position = pos })
+                .add(Sprite().apply { sprite = coinSprite })
+                .add(MapTrigger().apply { type = TriggerType.COIN })
+                .add(PhysicsBody().apply {
+                    shape = CircleShape().apply {
+                        this.radius = 1.5f
+                        this.position = pos
+                    }
+                    type = BodyDef.BodyType.StaticBody
+                })
+
     }
 
     fun loadMap(path: String): EntityInt {
@@ -90,22 +111,24 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
         var spawnTriggerFound = false
 
         for (mapObject: MapObject in triggerLayer.objects) {
-            when (mapObject.properties?.get("type")) {
-                "spawn" -> {
-                    if (mapObject is RectangleMapObject) {
+            if (mapObject is RectangleMapObject) {
+                when (mapObject.properties?.get("type")) {
+                    "spawn" -> {
                         playerPosition.x = mapObject.rectangle.x
                         playerPosition.y = mapObject.rectangle.y
                         spawnTriggerFound = true
-                    } else {
-                        error { throw RuntimeException("Spawn is of type ${mapObject.javaClass.name} instead of RectangleMapObject in $path") }
+                    }
+                    "coin" -> {
+                        val pos = Vector2()
+                        createCoin(mapObject.rectangle.getPosition(pos).scl(MAP_SCALE_FACTOR))
+                        info { "Making coin at $pos" }
+                    }
+                    "transition" -> {
+                        //TODO: Transition Level
                     }
                 }
-                "coin" -> {
-                    //TODO: Spawn Coins
-                }
-                "transition" -> {
-                    //TODO: Transition Level
-                }
+            } else {
+                error { throw RuntimeException("Spawn is of type ${mapObject.javaClass.name} instead of RectangleMapObject in $path") }
             }
         }
 
@@ -126,7 +149,6 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
         val fixtureDefs = GdxArray<FixtureDef>(false, collisionLayer.objects.count)
 
         loop@ for (mapObject: MapObject in collisionLayer.objects) {
-            info { mapObject.toString() }
             val shape: Shape = when (mapObject) {
                 is PolygonMapObject -> {
                     val vertices = mapObject.polygon.transformedVertices
@@ -145,9 +167,6 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
                         info { "Polygon has greater than 8 vertices [${vertices.size / 2}] and will be triangulated" }
                         val triangulator = EarClippingTriangulator()
                         val triangles = triangulator.computeTriangles(vertices)
-
-                        info { vertices.joinToString { e -> e.toString() } }
-                        info { triangles.toArray().joinToString { e -> e.toString() } }
 
                         if (triangles.size % 6 != 0) {
                             throw RuntimeException("Invalid triangles returned!")
@@ -177,7 +196,6 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
 
                 is RectangleMapObject -> {
                     val rect = mapObject.rectangle
-                    info { rect.getCenter(recycledVector2).scl(MAP_SCALE_FACTOR).toString() }
                     PolygonShape().apply {
                         setAsBox(rect.width * MAP_SCALE_FACTOR * .5f, rect.height * MAP_SCALE_FACTOR * .5f,
                                 rect.getCenter(recycledVector2).scl(MAP_SCALE_FACTOR), 0f)
