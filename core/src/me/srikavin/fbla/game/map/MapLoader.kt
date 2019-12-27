@@ -33,7 +33,8 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
     private val recycledFloatArray = FloatArray(6)
 
     private fun createPlayer(pos: Vector2) {
-        val playerAnimations = spritesheetLoader.loadAsespriteSheet("David.png", "David.json")
+        val playerAnimations = spritesheetLoader.loadAsespriteSheet("assets/graphics/characters/David.png",
+                "assets/graphics/characters/David.json")
 
         world.getSystem(CameraFollowSystem::class.java).camera.position.y = pos.y + 5
 
