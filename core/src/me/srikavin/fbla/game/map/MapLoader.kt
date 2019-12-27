@@ -168,10 +168,6 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
                         val triangulator = EarClippingTriangulator()
                         val triangles = triangulator.computeTriangles(vertices)
 
-                        if (triangles.size % 6 != 0) {
-                            throw RuntimeException("Invalid triangles returned!")
-                        }
-
                         for (x in 0 until triangles.size step 3) {
                             val fixtureDef = FixtureDef()
                             fixtureDef.shape = PolygonShape().apply {
