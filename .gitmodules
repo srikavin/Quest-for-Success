@@ -1,0 +1,3 @@
+[submodule "core/assets/assets"]
+	path = core/assets/assets
+	url = https://github.com/srikavin/FBLA_Game_Dev_Art_Assets

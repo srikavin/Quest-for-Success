@@ -1,7 +1,7 @@
 package me.srikavin.fbla.game.map
 
 import com.artemis.World
-import com.badlogic.gdx.Gdx
+import com.artemis.managers.TagManager
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.MapObject
@@ -12,23 +12,49 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
-import com.badlogic.gdx.utils.XmlReader
-import ktx.log.debug
 import ktx.log.error
 import ktx.log.info
 import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.GdxArray
+import me.srikavin.fbla.game.ecs.component.*
 import me.srikavin.fbla.game.ecs.component.Map
-import me.srikavin.fbla.game.ecs.component.PhysicsBody
 import me.srikavin.fbla.game.ecs.component.Transform
+import me.srikavin.fbla.game.ecs.system.CameraFollowSystem
+import me.srikavin.fbla.game.graphics.SpritesheetLoader
+
 
 private const val COLLISION_LAYER_NAME = "Collision"
+private const val TRIGGER_LAYER_NAME = "Trigger"
 private const val MAP_SCALE_FACTOR = 1 / 32f
 
 class MapLoader(private val assetManager: AssetManager, private val world: World) {
     private val recycledVector2 = Vector2()
-    private val xmlReader = XmlReader()
+    private val spritesheetLoader = SpritesheetLoader()
     private val recycledFloatArray = FloatArray(6)
+
+    private fun createPlayer(pos: Vector2) {
+        val playerAnimations = spritesheetLoader.loadAsespriteSheet("David.png", "David.json")
+
+        world.getSystem(CameraFollowSystem::class.java).camera.position.y = pos.y + 5
+
+        val e = world.createEntity().edit()
+                .add(PhysicsBody().apply {
+                    shape = PolygonShape().apply {
+                        setAsBox(.6f, 1f)
+                    }
+                    restitution = 0f
+                    density = 1f
+                    friction = 0.2f
+                })
+                .add(PlayerControlled())
+                .add(SpriteOffset(Vector2(-.75f, -1f)))
+                .add(Transform().apply { position = pos })
+                .add(SwitchableAnimation().apply { animations = playerAnimations; currentState = "Stand" })
+                .add(FixedRotation())
+                .entity
+
+        world.getSystem(TagManager::class.java).register("PLAYER", e)
+    }
 
     fun loadMap(path: String): EntityInt {
         val map = when {
@@ -39,24 +65,66 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
             }
         }
 
-        // Manually handle collision + trigger layers
-        xmlReader.parse(Gdx.files.internal(path))
+//        val entities = world.aspectSubscriptionManager[Aspect.all()].entities
+
+//        for (i in 0 until entities.size()) {
+//            info { i.toString() }
+//            world.delete(entities[i])
+//        }
+//        world.entityManager.reset()
 
         val mapEntity: EntityInt = world.create()
         val editor = world.edit(mapEntity)
 
-        editor.add(Transform()).add(Map().apply { this.map = map; this.scaleFactor = MAP_SCALE_FACTOR });
+        editor.add(Transform()).add(Map().apply { this.map = map; this.scaleFactor = MAP_SCALE_FACTOR })
 
-        val layer: MapLayer? = map.layers.get(COLLISION_LAYER_NAME)
+        val triggerLayer: MapLayer? = map.layers.get(TRIGGER_LAYER_NAME)
 
-        if (layer == null) {
+        if (triggerLayer == null) {
+            error { "Layer `$COLLISION_LAYER_NAME` does not exist on map loaded from `$path`" }
+            return mapEntity
+        }
+
+        val playerPosition = Vector2(5f, 5f)
+        var spawnTriggerFound = false
+
+        for (mapObject: MapObject in triggerLayer.objects) {
+            when (mapObject.properties?.get("type")) {
+                "spawn" -> {
+                    if (mapObject is RectangleMapObject) {
+                        playerPosition.x = mapObject.rectangle.x
+                        playerPosition.y = mapObject.rectangle.y
+                        spawnTriggerFound = true
+                    } else {
+                        error { throw RuntimeException("Spawn is of type ${mapObject.javaClass.name} instead of RectangleMapObject in $path") }
+                    }
+                }
+                "coin" -> {
+                    //TODO: Spawn Coins
+                }
+                "transition" -> {
+                    //TODO: Transition Level
+                }
+            }
+        }
+
+        createPlayer(playerPosition.scl(MAP_SCALE_FACTOR))
+
+        if (!spawnTriggerFound) {
+            error { throw RuntimeException("No Spawn trigger found in $path") }
+        }
+
+
+        val collisionLayer: MapLayer? = map.layers.get(COLLISION_LAYER_NAME)
+
+        if (collisionLayer == null) {
             info { "Layer `$COLLISION_LAYER_NAME` does not exist on map loaded from `$path`" }
             return mapEntity
         }
 
-        val fixtureDefs = GdxArray<FixtureDef>(false, layer.objects.count)
+        val fixtureDefs = GdxArray<FixtureDef>(false, collisionLayer.objects.count)
 
-        loop@ for (mapObject: MapObject in layer.objects) {
+        loop@ for (mapObject: MapObject in collisionLayer.objects) {
             info { mapObject.toString() }
             val shape: Shape = when (mapObject) {
                 is PolygonMapObject -> {
@@ -136,7 +204,7 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
         }
 
         info { fixtureDefs.toString() }
-        info { layer.objects.count.toString() }
+        info { collisionLayer.objects.count.toString() }
         editor.add(PhysicsBody(fixtureDefs, BodyDef.BodyType.StaticBody, 0f, 0.2f, 0f))
         editor.entity
 

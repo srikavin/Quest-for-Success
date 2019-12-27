@@ -7,7 +7,6 @@ import com.artemis.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import me.srikavin.fbla.game.ecs.component.Map
 import me.srikavin.fbla.game.ecs.component.Transform
@@ -37,7 +36,7 @@ class BackgroundRenderSystem : IteratingSystem() {
 
     override fun process(entityId: Int) {
         val transform = transformMapper[entityId]
-        mapRenderer.setView(camera.combined, transform.position.x, transform.position.y, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+        mapRenderer.setView(camera.combined, transform.position.x, transform.position.y + 10, Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
         mapRenderer.map = mapMapper[entityId].map
         mapRenderer.render()
     }

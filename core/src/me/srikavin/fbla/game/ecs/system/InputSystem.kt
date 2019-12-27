@@ -15,7 +15,7 @@ import java.util.function.BiConsumer
 
 private const val JUMP_DELAY_SEC = 1.5f
 private const val MAX_HORIZONTAL_VELOCITY = 7f
-private val JUMP_IMPULSE = Vector2(0.0f, 15.0f)
+private val JUMP_IMPULSE = Vector2(0.0f, 25.0f)
 private val LEFT_FORCE = Vector2(-50f, 10.0f)
 private val RIGHT_FORCE = Vector2(50f, 10.0f)
 
