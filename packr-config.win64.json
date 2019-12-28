@@ -1,0 +1,17 @@
+{
+  "platform": "windows64",
+  "jdk": "https://github.com/ojdkbuild/ojdkbuild/releases/download/java-1.8.0-openjdk-1.8.0.232-2.b09/java-1.8.0-openjdk-1.8.0.232-2.b09.ojdkbuild.windows.x86_64.zip",
+  "executable": "quest",
+  "classpath": [
+    "desktop/build/libs/desktop-1.0.jar"
+  ],
+  "removelibs": [
+    "desktop/build/libs/desktop-1.0.jar"
+  ],
+  "mainclass": "me.srikavin.fbla.game.desktop.DesktopLauncher",
+  "vmargs": [
+    "Xmx1G"
+  ],
+  "minimizejre": "hard",
+  "output": "out-win64"
+}

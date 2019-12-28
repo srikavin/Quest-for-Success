@@ -49,11 +49,11 @@ class FBLAGame : ApplicationAdapter() {
         val generator = FreeTypeFontGenerator(Gdx.files.internal("assets/fonts/Kenney Pixel.ttf"))
         val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
         parameter.size = 48
-        val font12: BitmapFont = generator.generateFont(parameter) // font size 12 pixels
+        val font12: BitmapFont = generator.generateFont(parameter)
 
         val fontMap = ObjectMap<String, Any>()
         fontMap.put("KenneyPixel", font12)
-        generator.dispose() // don't forget to dispose to avoid memory leaks!
+        generator.dispose()
 
         assetManager.load("assets/skin/skin.json", Skin::class.java, SkinLoader.SkinParameter(fontMap))
         assetManager.finishLoading()

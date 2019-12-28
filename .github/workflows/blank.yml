@@ -17,6 +17,13 @@ jobs:
       with:
         arguments: desktop:dist
         gradle-version: 5.6.2
+    - name: Generate Desktop build
+      run: java -jar packr.jar packr-config.win64.json
+    - name: Archive Release
+      uses: thedoctor0/zip-release@master
+      with:
+        filename: 'win64.zip'
+        basepath: 'out-win64'
     - uses: xresloader/upload-to-github-release@v1
       id: upload_release
       env:
