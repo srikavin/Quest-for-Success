@@ -24,7 +24,7 @@ jobs:
       uses: thedoctor0/zip-release@master
       with:
         filename: 'win64.zip'
-        basepath: 'out-win64'
+        path: 'out-win64'
     - uses: xresloader/upload-to-github-release@v1
       id: upload_release
       env:
