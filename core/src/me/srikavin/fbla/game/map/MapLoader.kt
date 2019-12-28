@@ -11,7 +11,7 @@ import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.objects.EllipseMapObject
 import com.badlogic.gdx.maps.objects.PolygonMapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
-import com.badlogic.gdx.maps.tiled.TiledMap
+import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
@@ -79,13 +79,12 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
     }
 
     fun loadMap(path: String): EntityInt {
-        val map = when {
-            assetManager.isLoaded(path) -> assetManager.get<TiledMap>(path)
-            else -> {
-                assetManager.load(path, TiledMap::class.java)
-                assetManager.finishLoadingAsset<TiledMap>(path)
-            }
-        }
+        val map = TmxMapLoader().load(path, TmxMapLoader.Parameters().apply {
+            generateMipMaps = true
+            textureMagFilter = Texture.TextureFilter.MipMapNearestNearest
+            textureMinFilter = Texture.TextureFilter.MipMapNearestNearest
+        })
+
 
 //        val entities = world.aspectSubscriptionManager[Aspect.all()].entities
 
