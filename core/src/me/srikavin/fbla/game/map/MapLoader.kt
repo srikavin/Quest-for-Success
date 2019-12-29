@@ -176,7 +176,7 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
                     }
                     info { vertices.joinToString { e -> e.toString() } }
 
-                    if (vertices.size > 8) {
+                    if (vertices.size / 2 >= 8) {
                         info { "Polygon has greater than 8 vertices [${vertices.size / 2}] and will be triangulated" }
                         val triangulator = EarClippingTriangulator()
                         val triangles = triangulator.computeTriangles(vertices)

@@ -12,12 +12,15 @@ import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.ecs.component.MapTrigger
 import me.srikavin.fbla.game.ecs.component.PhysicsBody
 import me.srikavin.fbla.game.physics.ContactListenerManager
+import me.srikavin.fbla.game.trigger.TriggerManager
 
 
 @All(MapTrigger::class, PhysicsBody::class)
 class TriggerSystem(private val listenerManager: ContactListenerManager) : IteratingSystem() {
     private lateinit var triggerMapper: ComponentMapper<MapTrigger>
     private lateinit var physicsMapper: ComponentMapper<PhysicsBody>
+
+    private val triggerManager = TriggerManager()
 
     @Wire
     lateinit var camera: OrthographicCamera
@@ -51,9 +54,9 @@ class TriggerSystem(private val listenerManager: ContactListenerManager) : Itera
             if (triggerMapper.has(e)) {
                 val trigger = triggerMapper[e]
 
-                // Remove body outside of physics simulation
+                // Handle outside of physics simulation
                 Gdx.app.postRunnable {
-                    world.delete(e)
+                    triggerManager.handle(world, e, other.userData as Int, trigger)
                 }
             }
 
