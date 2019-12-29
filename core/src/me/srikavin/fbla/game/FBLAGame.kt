@@ -24,6 +24,7 @@ import me.srikavin.fbla.game.dialogue.callable.DialogueMeeting
 import me.srikavin.fbla.game.ecs.component.DialogueComponent
 import me.srikavin.fbla.game.ecs.system.*
 import me.srikavin.fbla.game.map.MapLoader
+import me.srikavin.fbla.game.physics.ContactListenerManager
 
 
 class FBLAGame : ApplicationAdapter() {
@@ -67,10 +68,12 @@ class FBLAGame : ApplicationAdapter() {
         root.top().right()
         root.debug = true
 
+        val listenerManager = ContactListenerManager()
 
         val config = WorldConfigurationBuilder()
-                .with(InputSystem(),
-                        PhysicsSystem(physicsWorld),
+                .with(InputSystem(listenerManager),
+                        PhysicsSystem(physicsWorld, listenerManager),
+                        TriggerSystem(listenerManager),
                         CameraFollowSystem(),
                         PlayerAnimationSystem(),
                         RenderSystem(),
@@ -83,6 +86,7 @@ class FBLAGame : ApplicationAdapter() {
                 )
                 .with(TagManager())
                 .build()
+                .register(physicsWorld)
                 .register(camera)
                 .register(batch)
                 .register(skin)

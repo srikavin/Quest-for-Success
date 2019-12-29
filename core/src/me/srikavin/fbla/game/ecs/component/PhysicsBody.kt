@@ -37,6 +37,8 @@ class PhysicsBody() : Component() {
     var friction: Float = 0.3f
     var linearDamping: Float = .7f
 
+    var isSensor: Boolean = false
+
     /**
      * The "bounciness" of the physics body
      */

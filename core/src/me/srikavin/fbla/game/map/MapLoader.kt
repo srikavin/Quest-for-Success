@@ -15,6 +15,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
+import ktx.log.debug
 import ktx.log.error
 import ktx.log.info
 import me.srikavin.fbla.game.EntityInt
@@ -67,11 +68,12 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
         world.createEntity().edit()
                 .add(Transform().apply { position = pos })
                 .add(Sprite().apply { sprite = coinSprite })
+                .add(SpriteScale(0.5f))
+                .add(SpriteOffset(Vector2(-0.8f, -0.8f)))
                 .add(MapTrigger().apply { type = TriggerType.COIN })
                 .add(PhysicsBody().apply {
                     shape = CircleShape().apply {
-                        this.radius = 1.5f
-                        this.position = pos
+                        this.radius = .5f
                     }
                     type = BodyDef.BodyType.StaticBody
                 })
@@ -111,6 +113,7 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
 
         for (mapObject: MapObject in triggerLayer.objects) {
             if (mapObject is RectangleMapObject) {
+                debug { "Processing Trigger at ${mapObject.rectangle.x},${mapObject.rectangle.y} in $path" }
                 when (mapObject.properties?.get("type")) {
                     "spawn" -> {
                         playerPosition.x = mapObject.rectangle.x
@@ -122,8 +125,19 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
                         createCoin(mapObject.rectangle.getPosition(pos).scl(MAP_SCALE_FACTOR))
                         info { "Making coin at $pos" }
                     }
-                    "transition" -> {
-                        //TODO: Transition Level
+                    else -> {
+                        val rect = mapObject.rectangle
+                        world.createEntity().edit()
+                                .add(PhysicsBody().apply {
+                                    shape = PolygonShape().apply {
+                                        setAsBox(rect.width * MAP_SCALE_FACTOR * .5f, rect.height * MAP_SCALE_FACTOR * .5f,
+                                                rect.getCenter(recycledVector2).scl(MAP_SCALE_FACTOR), 0f)
+                                    }
+                                })
+                                .add(MapTrigger().apply {
+                                    //                                    type = TriggerType.valueOf(mapObject.properties.get("type").toString())
+                                    properties = mapObject.properties
+                                })
                     }
                 }
             } else {

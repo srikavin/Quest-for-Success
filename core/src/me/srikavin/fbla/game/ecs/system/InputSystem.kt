@@ -7,10 +7,13 @@ import com.artemis.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.*
 import me.srikavin.fbla.game.Actions
 import me.srikavin.fbla.game.ecs.component.PhysicsBody
 import me.srikavin.fbla.game.ecs.component.PlayerControlled
 import me.srikavin.fbla.game.ecs.component.Transform
+import me.srikavin.fbla.game.graphics.player_foot_fixture_id
+import me.srikavin.fbla.game.physics.ContactListenerManager
 import java.util.function.BiConsumer
 
 private const val JUMP_DELAY_SEC = 1.5f
@@ -20,29 +23,55 @@ private val LEFT_FORCE = Vector2(-50f, 10.0f)
 private val RIGHT_FORCE = Vector2(50f, 10.0f)
 
 @All(PlayerControlled::class, PhysicsBody::class, Transform::class)
-class InputSystem : IteratingSystem() {
-    lateinit var playerControlledMapper: ComponentMapper<PlayerControlled>
-    lateinit var physicsBodyMapper: ComponentMapper<PhysicsBody>
-    lateinit var transformMapper: ComponentMapper<Transform>
+class InputSystem(private val listenerManager: ContactListenerManager) : IteratingSystem() {
+    private lateinit var playerControlledMapper: ComponentMapper<PlayerControlled>
+    private lateinit var physicsBodyMapper: ComponentMapper<PhysicsBody>
+    private lateinit var transformMapper: ComponentMapper<Transform>
 
     @Wire
     lateinit var camera: OrthographicCamera
+    @Wire
+    lateinit var physicsWorld: World
 
 
-    var jumpDelay = 0f
+    inner class FootContactListener : ContactListener {
+        override fun endContact(contact: Contact) {
+            if (contact.fixtureA.userData == player_foot_fixture_id && !contact.fixtureB.isSensor ||
+                    contact.fixtureB.userData == player_foot_fixture_id && !contact.fixtureA.isSensor) {
+                allowJump = false
+            }
+        }
+
+        override fun beginContact(contact: Contact) {
+            if (contact.fixtureA.userData == player_foot_fixture_id && !contact.fixtureB.isSensor ||
+                    contact.fixtureB.userData == player_foot_fixture_id && !contact.fixtureA.isSensor) {
+                allowJump = true
+            }
+        }
+
+        override fun preSolve(contact: Contact, oldManifold: Manifold) {
+        }
+
+        override fun postSolve(contact: Contact, impulse: ContactImpulse) {
+        }
+    }
+
+    override fun initialize() {
+        super.initialize()
+        listenerManager.addListener(FootContactListener())
+    }
+
+    var allowJump = true
 
     override fun process(entityId: Int) {
         val body = physicsBodyMapper[entityId].body
-        val position = transformMapper[entityId].position
-
-        jumpDelay -= Gdx.graphics.deltaTime
 
         playerControlledMapper[entityId].bindings.bindings.forEach(BiConsumer { action, keyCode ->
             if (Gdx.input.isKeyPressed(keyCode)) {
                 when (action) {
                     Actions.JUMP -> {
-                        if (jumpDelay < 0) {
-                            jumpDelay = JUMP_DELAY_SEC
+                        if (allowJump) {
+                            allowJump = false
                         } else {
                             return@BiConsumer
                         }

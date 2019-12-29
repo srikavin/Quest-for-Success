@@ -22,7 +22,9 @@ class EntityRenderSystem : IteratingSystem() {
     private lateinit var switchableAnimationMapper: ComponentMapper<SwitchableAnimation>
     private lateinit var transformMapper: ComponentMapper<Transform>
     private lateinit var offsetMapper: ComponentMapper<SpriteOffset>
+    private lateinit var scaleMapper: ComponentMapper<SpriteScale>
     private val recycledPosition = Vector2()
+    private val defaultScale = Vector2(1f, 1f)
 
     @Wire
     lateinit var batch: SpriteBatch
@@ -39,6 +41,11 @@ class EntityRenderSystem : IteratingSystem() {
         recycledPosition.set(transformMapper[entityId].position)
 
         var mirrored: Boolean = false
+
+        val scale = when {
+            scaleMapper.has(entityId) -> scaleMapper[entityId].scale
+            else -> defaultScale
+        }
 
         val sprite: TextureRegion = when {
             spriteMapper.has(entityId) -> spriteMapper[entityId].sprite
@@ -60,8 +67,8 @@ class EntityRenderSystem : IteratingSystem() {
             recycledPosition.add(offsetMapper[entityId].offset)
         }
 
-        val w = sprite.regionWidth * scale_factor
-        val h = sprite.regionHeight * scale_factor
+        val w = sprite.regionWidth * scale_factor * scale.x
+        val h = sprite.regionHeight * scale_factor * scale.y
 
 
         if (mirrored) {
