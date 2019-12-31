@@ -7,7 +7,7 @@ import com.artemis.managers.TagManager
 import com.badlogic.gdx.graphics.OrthographicCamera
 import me.srikavin.fbla.game.ecs.component.Transform
 
-class CameraFollowSystem(private val followVertical: Boolean = false, private val followHorizontal: Boolean = true) : BaseSystem() {
+class CameraFollowSystem(private val followVertical: Boolean = true, private val followHorizontal: Boolean = true) : BaseSystem() {
     private lateinit var transformMapper: ComponentMapper<Transform>
 
     @Wire
