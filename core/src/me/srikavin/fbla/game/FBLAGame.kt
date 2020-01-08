@@ -121,5 +121,6 @@ class FBLAGame : ApplicationAdapter() {
     }
 
     override fun dispose() {
+        world.dispose()
     }
 }

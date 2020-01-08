@@ -2,6 +2,9 @@ package me.srikavin.fbla.game
 
 import com.badlogic.gdx.Input
 
+/**
+ * List of all possible actions to do within the game
+ */
 enum class Actions {
     MOVE_LEFT,
     MOVE_RIGHT,
@@ -10,6 +13,9 @@ enum class Actions {
     QUIT
 }
 
+/**
+ * A list of bindings between actions and Gdx [Input] keys
+ */
 class KeyBindings(val bindings: Map<Actions, Int>) {
     constructor() : this(
             mapOf<Actions, Int>(

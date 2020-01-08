@@ -7,6 +7,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 
 abstract class Minigame {
+    /**
+     * Stores whether the minigame is currently being played by the user.
+     */
     var active: Boolean = false
 
     /**

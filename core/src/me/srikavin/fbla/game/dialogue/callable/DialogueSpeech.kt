@@ -5,7 +5,6 @@ import me.srikavin.fbla.game.dialogue.DialogueCallable
 class DialogueSpeech : DialogueCallable() {
 
     override fun run() {
-
         var index = getResponse(listOf("This year I plan to grow our membership and secure more internships for everyone.", "I just need this position for this award thing."))
 
         if (index == 0) {

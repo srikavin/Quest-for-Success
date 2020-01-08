@@ -17,19 +17,21 @@ import ktx.log.info
 import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.ecs.component.MinigameComponent
 
-
+/**
+ * Handles rendering active minigames
+ */
 @All(MinigameComponent::class)
 class MinigameRenderSystem : IteratingSystem() {
-    lateinit var minigameMapper: ComponentMapper<MinigameComponent>
-
     @Wire
-    lateinit var camera: OrthographicCamera
+    private lateinit var minigameMapper: ComponentMapper<MinigameComponent>
     @Wire
-    lateinit var batch: SpriteBatch
+    private lateinit var camera: OrthographicCamera
     @Wire
-    lateinit var stage: Stage
+    private lateinit var batch: SpriteBatch
     @Wire
-    lateinit var skin: Skin
+    private lateinit var stage: Stage
+    @Wire
+    private lateinit var skin: Skin
 
     override fun initialize() {
         super.initialize()

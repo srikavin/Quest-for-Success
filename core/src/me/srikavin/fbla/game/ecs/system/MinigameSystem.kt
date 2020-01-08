@@ -2,15 +2,23 @@ package me.srikavin.fbla.game.ecs.system
 
 import com.artemis.ComponentMapper
 import com.artemis.annotations.All
+import com.artemis.annotations.Wire
 import com.artemis.managers.TagManager
 import com.artemis.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import me.srikavin.fbla.game.ecs.component.DisableInput
 import me.srikavin.fbla.game.ecs.component.MinigameComponent
 
+/**
+ * Handles processing minigame updates controlling player movement
+ */
 @All(MinigameComponent::class)
 class MinigameSystem : IteratingSystem() {
-    lateinit var minigameMapper: ComponentMapper<MinigameComponent>
+    @Wire
+    private lateinit var minigameMapper: ComponentMapper<MinigameComponent>
+    /**
+     * Keep a single instance to avoid allocations within the game loop
+     */
     private val disableInput = DisableInput()
 
     override fun process(entityId: Int) {

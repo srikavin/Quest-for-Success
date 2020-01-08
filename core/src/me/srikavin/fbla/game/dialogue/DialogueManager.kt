@@ -13,13 +13,22 @@ import ktx.actors.onClickEvent
 import me.srikavin.fbla.game.dialogue.callable.*
 import me.srikavin.fbla.game.ecs.component.DialogueComponent
 
+/**
+ * Managers communications with [DialogueCallable]s and [me.srikavin.fbla.game.ecs.system.DialogueSystem] and handles
+ * updating UI drawn to the screen with dialogue text and options.
+ */
 class DialogueManager(private val stage: Stage, skin: Skin) {
+    private val keys = arrayOf(Input.Keys.NUM_1, Input.Keys.NUM_2, Input.Keys.NUM_3, Input.Keys.NUM_4, Input.Keys.NUM_5)
+
     private val dialogueRoot: Table
     private val dialogueTextContainer: Container<TypingLabel>
     private val dialogueOptionsTable: Table = Table(skin)
     private val dialogueText: TypingLabel
 
+    var component: DialogueComponent? = null
+
     companion object {
+
         private val dialogues = mapOf(
                 "meeting" to DialogueMeeting(),
                 "make_chapter" to DialogueMakeChapter(),
@@ -28,13 +37,15 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
                 "letter_rec" to DialogueLetterRec()
         )
 
+        /**
+         * Gets the [DialogueCallable] associated with the given name
+         *
+         * @param name The name of the Dialogue Callable to lookup
+         */
         fun getDialogueCallable(name: String): DialogueCallable {
             return dialogues.getValue(name)
         }
     }
-
-
-    var component: DialogueComponent? = null
 
     init {
         dialogueOptionsTable.center().bottom()
@@ -55,7 +66,6 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
                 component?.channel?.offer(ResumeDialoguePacket) ?: return
             }
         }
-
 
         stage.addActor(dialogueRoot)
     }
@@ -96,7 +106,6 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
         }
     }
 
-    val keys = arrayOf(Input.Keys.NUM_1, Input.Keys.NUM_2, Input.Keys.NUM_3, Input.Keys.NUM_4, Input.Keys.NUM_5)
 
     private fun handleKeyPress() {
         val component = this.component ?: return
@@ -114,6 +123,10 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
     }
 
 
+    /**
+     * Updates the state of the dialogue and polls for any incoming packets.
+     * This should be called within the game loop.
+     */
     fun update() {
         val component = this.component
 
@@ -122,7 +135,6 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
             dialogueText.setText("")
             return
         }
-
 
         handleKeyPress()
         val packet = component.channel.poll()

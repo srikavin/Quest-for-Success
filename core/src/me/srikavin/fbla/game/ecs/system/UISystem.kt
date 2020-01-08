@@ -1,32 +1,28 @@
 package me.srikavin.fbla.game.ecs.system
 
 import com.artemis.BaseSystem
-import com.artemis.ComponentMapper
 import com.artemis.annotations.Wire
-import com.artemis.managers.TagManager
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.rafaskoberg.gdx.typinglabel.TypingConfig
 import me.srikavin.fbla.game.GameState
-import me.srikavin.fbla.game.ecs.component.Transform
 
+/**
+ * Responsible for drawing and updating UI elements
+ */
 class UISystem : BaseSystem() {
     @Wire
-    lateinit var stage: Stage
+    private lateinit var stage: Stage
     @Wire
-    lateinit var root: Table
-    lateinit var fpsCell: Cell<Label>
+    private lateinit var root: Table
+    @Wire
+    private lateinit var gameState: GameState
 
-    @Wire
-    lateinit var tranformMapper: ComponentMapper<Transform>
-    @Wire
-    lateinit var skin: Skin
-    @Wire
-    lateinit var gameState: GameState
+    private lateinit var scoreCell: Cell<Label>
+    private lateinit var livesCell: Cell<Label>
 
     override fun initialize() {
         super.initialize()
@@ -34,15 +30,13 @@ class UISystem : BaseSystem() {
 
         Gdx.input.inputProcessor = stage
 
-        fpsCell = root.add("60")
+        scoreCell = root.add("")
+        livesCell = root.add("")
     }
 
     override fun processSystem() {
-        val player = world.getSystem(TagManager::class.java).getEntityId("PLAYER")
-
-
-//        cell.actor.setText("Velocty: ${bodyMapper[player].body.linearVelocity}")
-        fpsCell.actor.setText("Score: ${gameState.score}")
+        scoreCell.actor.setText("Score: ${gameState.score}")
+        livesCell.actor.setText("Lives: ${gameState.lives}")
 
         stage.act(Gdx.graphics.deltaTime)
         stage.draw()

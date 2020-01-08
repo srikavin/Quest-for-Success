@@ -7,13 +7,14 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
-
+/**
+ * Responsible for updating the camera's projection matrix and setting up the screen to render the frame
+ */
 class RenderSystem : BaseSystem() {
-
     @Wire
-    lateinit var camera: OrthographicCamera
+    private lateinit var camera: OrthographicCamera
     @Wire
-    lateinit var batch: SpriteBatch
+    private lateinit var batch: SpriteBatch
 
     override fun processSystem() {
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f)

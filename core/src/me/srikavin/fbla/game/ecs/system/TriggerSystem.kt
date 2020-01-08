@@ -3,9 +3,7 @@ package me.srikavin.fbla.game.ecs.system
 import com.artemis.BaseEntitySystem
 import com.artemis.ComponentMapper
 import com.artemis.annotations.All
-import com.artemis.annotations.Wire
 import com.artemis.managers.TagManager
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.physics.box2d.*
 import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.ecs.component.MapTrigger
@@ -13,20 +11,16 @@ import me.srikavin.fbla.game.ecs.component.PhysicsBody
 import me.srikavin.fbla.game.physics.ContactListenerManager
 import me.srikavin.fbla.game.trigger.TriggerManager
 
-
+/**
+ * Responsible for handling trigger
+ */
 @All(MapTrigger::class, PhysicsBody::class)
 class TriggerSystem(private val listenerManager: ContactListenerManager) : BaseEntitySystem() {
+    private data class TriggerEvent(val player: EntityInt, val other: EntityInt)
+
     private lateinit var triggerMapper: ComponentMapper<MapTrigger>
-    private lateinit var physicsMapper: ComponentMapper<PhysicsBody>
-
-    data class TriggerEvent(val player: EntityInt, val other: EntityInt)
-
     private val triggerManager = TriggerManager()
-
     private val collisions: MutableSet<TriggerEvent> = HashSet()
-
-    @Wire
-    lateinit var camera: OrthographicCamera
 
     inner class CollisionListener : ContactListener {
         override fun endContact(contact: Contact) {

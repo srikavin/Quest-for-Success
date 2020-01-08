@@ -10,7 +10,7 @@ import com.badlogic.gdx.physics.box2d.World
 /**
  * Responsible for drawing overlays over box2d physics objects
  */
-class PhysicsDebugSystem(var physicsWorld: World, var debug: Boolean = true) : BaseSystem() {
+class PhysicsDebugSystem(private var physicsWorld: World, private var debug: Boolean = true) : BaseSystem() {
     private var debugRenderer = Box2DDebugRenderer()
 
     @Wire

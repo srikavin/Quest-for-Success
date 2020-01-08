@@ -1,10 +1,11 @@
 package me.srikavin.fbla.game.ecs.component
 
 import com.artemis.Component
-import com.badlogic.gdx.graphics.g2d.Animation
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 
+/**
+ * Component containing the offset from the entity's position ([Transform]) and the sprite's position
+ */
 class SpriteOffset() : Component() {
     constructor(offset: Vector2) : this() {
         this.offset = offset

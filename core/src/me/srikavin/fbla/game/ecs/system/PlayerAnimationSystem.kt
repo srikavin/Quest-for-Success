@@ -20,6 +20,9 @@ const val WALK_ANIMATION = "Walk"
  */
 const val STAND_ANIMATION = "Stand"
 
+/**
+ * Responsible for updating the player's animation state when moving, jumping, or standing
+ */
 class PlayerAnimationSystem : BaseSystem() {
     @Wire
     private lateinit var physicsBodyMapper: ComponentMapper<PhysicsBody>

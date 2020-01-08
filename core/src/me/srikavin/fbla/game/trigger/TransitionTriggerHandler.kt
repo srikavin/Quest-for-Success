@@ -11,7 +11,7 @@ import me.srikavin.fbla.game.map.MapLoader
 class TransitionTriggerHandler : TriggerHandler {
     override fun run(world: World, player: EntityInt, triggerEntity: EntityInt, trigger: MapTrigger) {
         val mapLoader = world.getRegistered(MapLoader::class.java)
-        val newMap = world.getMapper(MapTrigger::class.java)[triggerEntity].properties!!["level_name"]!!.toString()
+        val newMap = world.getMapper(MapTrigger::class.java)[triggerEntity].properties["level_name"]!!.toString()
 
         mapLoader.loadMap(world, newMap)
     }

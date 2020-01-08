@@ -1,4 +1,4 @@
-package me.srikavin.quiz.model
+package me.srikavin.fbla.game.minigame.quiz
 
 /**
  * A Model class that holds the structure of an answer response as returned by a repository

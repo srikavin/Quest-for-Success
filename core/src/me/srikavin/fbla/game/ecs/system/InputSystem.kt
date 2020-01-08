@@ -6,7 +6,6 @@ import com.artemis.annotations.Exclude
 import com.artemis.annotations.Wire
 import com.artemis.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Contact
 import com.badlogic.gdx.physics.box2d.ContactImpulse
@@ -20,20 +19,23 @@ import me.srikavin.fbla.game.ecs.component.Transform
 import me.srikavin.fbla.game.graphics.player_foot_fixture_id
 import me.srikavin.fbla.game.physics.ContactListenerManager
 
-private const val JUMP_DELAY_SEC = 1.5f
 private const val MAX_HORIZONTAL_VELOCITY = 7f
 private val JUMP_IMPULSE = Vector2(0.0f, 25.0f)
 private val LEFT_FORCE = Vector2(-50f, 0.0f)
 private val RIGHT_FORCE = Vector2(50f, 0.0f)
 
+/**
+ * Responsible for handling player input and controlling jump timings
+ */
 @All(PlayerControlled::class, PhysicsBody::class, Transform::class)
 @Exclude(DisableInput::class)
 class InputSystem(private val listenerManager: ContactListenerManager) : IteratingSystem() {
+    @Wire
     private lateinit var playerControlledMapper: ComponentMapper<PlayerControlled>
+    @Wire
     private lateinit var physicsBodyMapper: ComponentMapper<PhysicsBody>
 
-    @Wire
-    lateinit var camera: OrthographicCamera
+    private var allowJump: Int = 0
 
     inner class FootContactListener : ContactListener {
         override fun endContact(contact: Contact) {
@@ -65,7 +67,6 @@ class InputSystem(private val listenerManager: ContactListenerManager) : Iterati
         listenerManager.addListener(FootContactListener())
     }
 
-    var allowJump: Int = 0
 
     override fun process(entityId: Int) {
         val body = physicsBodyMapper[entityId].body
@@ -96,6 +97,5 @@ class InputSystem(private val listenerManager: ContactListenerManager) : Iterati
                 }
             }
         }
-
     }
 }

@@ -1,4 +1,4 @@
-package me.srikavin.quiz.model
+package me.srikavin.fbla.game.minigame.quiz
 
 /**
  * An enum representing the possible states a game can be in

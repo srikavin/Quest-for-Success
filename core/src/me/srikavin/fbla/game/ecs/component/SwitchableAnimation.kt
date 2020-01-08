@@ -5,6 +5,9 @@ import com.badlogic.gdx.graphics.g2d.Animation
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import ktx.collections.GdxMap
 
+/**
+ * Component containing mapping between entity states and animations
+ */
 class SwitchableAnimation : Component() {
     lateinit var animations: GdxMap<String, Animation<TextureRegion>>
     lateinit var currentState: String

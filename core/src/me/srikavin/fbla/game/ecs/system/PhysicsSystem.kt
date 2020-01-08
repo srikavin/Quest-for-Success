@@ -8,6 +8,7 @@ import com.artemis.systems.IteratingSystem
 import com.artemis.utils.IntBag
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
+import ktx.assets.disposeSafely
 import ktx.collections.GdxArray
 import me.srikavin.fbla.game.ecs.component.FixedRotation
 import me.srikavin.fbla.game.ecs.component.MapTrigger
@@ -19,6 +20,8 @@ import me.srikavin.fbla.game.physics.ContactListenerManager
 /**
  * Responsible for communicating and keeping entities in sync with Box2D. The physics engine uses a fixed timestep of
  * 60 steps a second.
+ *
+ * Handles entities which have both [Transform] and [PhysicsBody] components attached
  */
 @All(Transform::class, PhysicsBody::class)
 class PhysicsSystem(var physicsWorld: World, private val contactManager: ContactListenerManager) : IteratingSystem() {
@@ -124,5 +127,10 @@ class PhysicsSystem(var physicsWorld: World, private val contactManager: Contact
     override fun process(entityId: Int) {
         // Update positions of physics entities
         transformMapper[entityId].position.set(physicsMapper[entityId].body.position)
+    }
+
+    override fun dispose() {
+        super.dispose()
+        physicsWorld.disposeSafely()
     }
 }

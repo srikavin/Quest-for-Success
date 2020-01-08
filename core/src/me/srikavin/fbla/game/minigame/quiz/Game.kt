@@ -1,4 +1,4 @@
-package me.srikavin.quiz.model
+package me.srikavin.fbla.game.minigame.quiz
 
 import java.util.*
 
@@ -42,7 +42,6 @@ class Game(
         set(value) {
             field = value
             state.currentQuestion = value
-            this.state = state
         }
 
     init {

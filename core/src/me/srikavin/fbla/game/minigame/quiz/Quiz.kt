@@ -1,4 +1,4 @@
-package me.srikavin.quiz.model
+package me.srikavin.fbla.game.minigame.quiz
 
 /**
  * A model class representing a quiz as provided by implementations of [me.srikavin.quiz.repository.QuizRepository]

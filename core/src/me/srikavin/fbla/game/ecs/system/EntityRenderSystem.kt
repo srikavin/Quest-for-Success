@@ -2,7 +2,6 @@ package me.srikavin.fbla.game.ecs.system
 
 import com.artemis.ComponentMapper
 import com.artemis.annotations.All
-import com.artemis.annotations.Exclude
 import com.artemis.annotations.One
 import com.artemis.annotations.Wire
 import com.artemis.systems.IteratingSystem
@@ -13,9 +12,14 @@ import com.badlogic.gdx.math.Vector2
 import me.srikavin.fbla.game.ecs.component.*
 import me.srikavin.fbla.game.graphics.scale_factor
 
+/**
+ * Responsible for rendering entities with the following components
+ *  * [Animated]
+ *  * [Sprite]
+ *  * [SwitchableAnimation]
+ */
 @One(Animated::class, Sprite::class, SwitchableAnimation::class)
 @All(Transform::class)
-@Exclude(Background::class)
 class EntityRenderSystem : IteratingSystem() {
     private lateinit var spriteMapper: ComponentMapper<Sprite>
     private lateinit var animatedMapper: ComponentMapper<Animated>
@@ -27,10 +31,9 @@ class EntityRenderSystem : IteratingSystem() {
     private val defaultScale = Vector2(1f, 1f)
 
     @Wire
-    lateinit var batch: SpriteBatch
+    private lateinit var batch: SpriteBatch
 
     private var stateTime = 0f
-
 
     override fun begin() {
         stateTime += Gdx.graphics.deltaTime
@@ -40,7 +43,7 @@ class EntityRenderSystem : IteratingSystem() {
     override fun process(entityId: Int) {
         recycledPosition.set(transformMapper[entityId].position)
 
-        var mirrored: Boolean = false
+        var mirrored = false
 
         val scale = when {
             scaleMapper.has(entityId) -> scaleMapper[entityId].scale
