@@ -3,11 +3,9 @@ package me.srikavin.fbla.game.ecs.system
 import com.artemis.ComponentMapper
 import com.artemis.EntitySubscription
 import com.artemis.annotations.All
-import com.artemis.annotations.Wire
 import com.artemis.managers.TagManager
 import com.artemis.systems.IteratingSystem
 import com.artemis.utils.IntBag
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 import ktx.collections.GdxArray
@@ -18,7 +16,10 @@ import me.srikavin.fbla.game.ecs.component.Transform
 import me.srikavin.fbla.game.graphics.player_foot_fixture_id
 import me.srikavin.fbla.game.physics.ContactListenerManager
 
-
+/**
+ * Responsible for communicating and keeping entities in sync with Box2D. The physics engine uses a fixed timestep of
+ * 60 steps a second.
+ */
 @All(Transform::class, PhysicsBody::class)
 class PhysicsSystem(var physicsWorld: World, private val contactManager: ContactListenerManager) : IteratingSystem() {
     lateinit var transformMapper: ComponentMapper<Transform>
@@ -90,7 +91,7 @@ class PhysicsSystem(var physicsWorld: World, private val contactManager: Contact
 
                 if (e == world.getSystem(TagManager::class.java).getEntityId("PLAYER")) {
                     val footBox = FixtureDef().apply {
-//                        this.isSensor = true
+                        //                        this.isSensor = true
                         this.shape = PolygonShape().apply {
                             setAsBox(0.5f, 0.05f, Vector2(0f, -1f), 0f)
                         }
@@ -116,15 +117,12 @@ class PhysicsSystem(var physicsWorld: World, private val contactManager: Contact
         }
     }
 
-
-    @Wire
-    lateinit var camera: OrthographicCamera
-
     override fun begin() {
         physicsWorld.step(1 / 60f, 6, 6)
     }
 
     override fun process(entityId: Int) {
+        // Update positions of physics entities
         transformMapper[entityId].position.set(physicsMapper[entityId].body.position)
     }
 }

@@ -7,13 +7,18 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 
 
-class PhysicsDebugSystem(var physicsWorld: World) : BaseSystem() {
+/**
+ * Responsible for drawing overlays over box2d physics objects
+ */
+class PhysicsDebugSystem(var physicsWorld: World, var debug: Boolean = true) : BaseSystem() {
     private var debugRenderer = Box2DDebugRenderer()
 
     @Wire
     lateinit var camera: OrthographicCamera
 
     override fun processSystem() {
-        debugRenderer.render(physicsWorld, camera.combined)
+        if (debug) {
+            debugRenderer.render(physicsWorld, camera.combined)
+        }
     }
 }
