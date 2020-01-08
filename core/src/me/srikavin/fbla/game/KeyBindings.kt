@@ -6,7 +6,8 @@ enum class Actions {
     MOVE_LEFT,
     MOVE_RIGHT,
     JUMP,
-    USE
+    USE,
+    QUIT
 }
 
 class KeyBindings(val bindings: Map<Actions, Int>) {
@@ -15,7 +16,8 @@ class KeyBindings(val bindings: Map<Actions, Int>) {
                     Pair(Actions.MOVE_LEFT, Input.Keys.LEFT),
                     Pair(Actions.MOVE_RIGHT, Input.Keys.RIGHT),
                     Pair(Actions.JUMP, Input.Keys.UP),
-                    Pair(Actions.USE, Input.Keys.E)
+                    Pair(Actions.USE, Input.Keys.E),
+                    Pair(Actions.QUIT, Input.Keys.ESCAPE)
             )
     )
 }

@@ -17,7 +17,7 @@ TODO
 | Move Up | *Up Arrow* |
 | Move Down | *Down Arrow* |
 | Move Right | *Right Arrow* |
-| Use Item | *E* |
+| Quit Game | *Escape* |
 
 ## Run Instructions
 

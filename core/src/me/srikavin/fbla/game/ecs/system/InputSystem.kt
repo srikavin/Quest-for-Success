@@ -90,6 +90,9 @@ class InputSystem(private val listenerManager: ContactListenerManager) : Iterati
                         }
                     }
                     Actions.USE -> TODO()
+                    Actions.QUIT -> {
+                        Gdx.app.exit()
+                    }
                 }
             }
         }
