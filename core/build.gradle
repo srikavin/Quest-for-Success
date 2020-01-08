@@ -1,6 +1,22 @@
 apply plugin: "kotlin"
+apply plugin: 'org.jetbrains.dokka'
 
 sourceCompatibility = 1.7
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-sourceSets.main.java.srcDirs = [ "src/" ]
+buildscript {
+    dependencies {
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:0.10.0"
+    }
+
+    repositories {
+        jcenter()
+    }
+}
+
+dokka {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/dokka"
+}
+
+sourceSets.main.java.srcDirs = ["src/"]

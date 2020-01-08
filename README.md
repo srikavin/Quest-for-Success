@@ -45,15 +45,13 @@ For more technical information, read `technical_readme.md`.
  * [Gradle](https://gradle.org/) - used to automate builds and manage dependencies
  * [Git SCM](https://git-scm.org) - used for version control
  * [Kotlin](http://kotlinlang.org/) - used to write readable and ergonomic code
- * [Tiled](https://www.mapeditor.org/) - used to create flexible levels
+ * [Tiled](https://www.mapeditor.org/) - used to create flexible and reusable levels
+ * [Aseprite](https://www.aseprite.org/) - used to design art in a retro pixelart style
 
 ### Dependencies Used
  * [Kotlin](http://kotlinlang.org/) - used for null-safety and language features
+ * [libgdx](https://libgdx.badlogicgames.com/) - used as a game programming and graphics framework
 
 ## Screenshots
 
 TODO
-
-
-
-

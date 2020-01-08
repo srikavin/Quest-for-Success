@@ -9,18 +9,34 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.rafaskoberg.gdx.typinglabel.TypingAdapter
 import com.rafaskoberg.gdx.typinglabel.TypingLabel
 import kotlinx.coroutines.channels.sendBlocking
+import ktx.actors.onClickEvent
+import me.srikavin.fbla.game.dialogue.callable.*
 import me.srikavin.fbla.game.ecs.component.DialogueComponent
 
 class DialogueManager(private val stage: Stage, skin: Skin) {
     private val dialogueRoot: Table
     private val dialogueTextContainer: Container<TypingLabel>
-    private val dialogueOptionsTable: Table
+    private val dialogueOptionsTable: Table = Table(skin)
     private val dialogueText: TypingLabel
+
+    companion object {
+        private val dialogues = mapOf(
+                "meeting" to DialogueMeeting(),
+                "make_chapter" to DialogueMakeChapter(),
+                "job_interview" to DialogueJobInterview(),
+                "speech" to DialogueSpeech(),
+                "letter_rec" to DialogueLetterRec()
+        )
+
+        fun getDialogueCallable(name: String): DialogueCallable {
+            return dialogues.getValue(name)
+        }
+    }
+
 
     var component: DialogueComponent? = null
 
     init {
-        dialogueOptionsTable = Table(skin)
         dialogueOptionsTable.center().bottom()
 
         dialogueText = TypingLabel("", skin)
@@ -40,26 +56,27 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
             }
         }
 
+
         stage.addActor(dialogueRoot)
     }
 
     private fun handleDialoguePacket(component: DialogueComponent, packet: DialoguePacket) {
-        println(packet.javaClass.name)
         when (packet) {
             is RequestResponseDialoguePacket -> {
-                println(packet.options)
                 dialogueOptionsTable.clear()
                 val width = (stage.width - (100f * (5 - packet.options.size))) / packet.options.size
-                println(width)
                 packet.options.forEachIndexed { index, s ->
                     val label = dialogueOptionsTable.add("[${index + 1}] $s").pad(10f).width(width)
                     label.actor.setWrap(true)
                     label.actor.setFontScale(0.5f)
+                    label.actor.onClickEvent { _, _ ->
+                        component.waitingForResponse = false
+                        component.channel.offer(ReceiveResponseDialoguePacket(index))
+                    }
                 }
                 component.waitingForResponse = true
             }
             is SayDialoguePacket -> {
-                println(packet.message)
                 dialogueOptionsTable.clear()
                 dialogueText.setText(packet.message)
                 dialogueText.restart()
@@ -68,7 +85,6 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
                 component.channel.sendBlocking(ScoreDialoguePacket(component.score))
             }
             is UpdateScoreDialoguePacket -> {
-                println(packet.delta)
                 component.score += packet.delta
                 component.channel.sendBlocking(ResumeDialoguePacket)
             }
@@ -99,7 +115,14 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
 
 
     fun update() {
-        val component = this.component ?: return
+        val component = this.component
+
+        if (component == null) {
+            dialogueOptionsTable.clear()
+            dialogueText.setText("")
+            return
+        }
+
 
         handleKeyPress()
         val packet = component.channel.poll()

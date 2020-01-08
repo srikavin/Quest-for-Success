@@ -3,12 +3,16 @@ package me.srikavin.fbla.game.minigame.quiz
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.maps.MapProperties
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.rafaskoberg.gdx.typinglabel.TypingLabel
 import me.srikavin.fbla.game.GdxArray
 import me.srikavin.fbla.game.minigame.Minigame
 
-class QuizMinigame : Minigame {
-    val inputs = GdxArray<Int>()
+class QuizMinigame : Minigame() {
+    private val inputs = GdxArray<Int>()
 
     init {
         inputs.add(Input.Keys.NUM_1)
@@ -18,12 +22,17 @@ class QuizMinigame : Minigame {
         inputs.add(Input.Keys.NUM_5)
     }
 
-    override fun render(camera: OrthographicCamera, batch: SpriteBatch, stage: Stage) {
+    override fun reset(properties: MapProperties) {
 
     }
 
-    override fun isActive(): Boolean {
-        return false
+    override fun initalize(skin: Skin, stage: Stage) {
+        stage.root = Table(skin)
+        stage.root.addActor(TypingLabel("Text", skin))
+    }
+
+    override fun render(camera: OrthographicCamera, batch: SpriteBatch, stage: Stage) {
+
     }
 
     override fun shouldRenderBackground(): Boolean {

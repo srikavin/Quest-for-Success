@@ -90,10 +90,11 @@ class PhysicsSystem(var physicsWorld: World, private val contactManager: Contact
 
                 if (e == world.getSystem(TagManager::class.java).getEntityId("PLAYER")) {
                     val footBox = FixtureDef().apply {
-                        this.isSensor = true
+//                        this.isSensor = true
                         this.shape = PolygonShape().apply {
                             setAsBox(0.5f, 0.05f, Vector2(0f, -1f), 0f)
                         }
+                        friction = 1f
                     }
 
                     val fixture = physics.body.createFixture(footBox)

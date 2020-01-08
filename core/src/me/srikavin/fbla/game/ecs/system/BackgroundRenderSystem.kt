@@ -10,33 +10,35 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
-import me.srikavin.fbla.game.ecs.component.Map
+import me.srikavin.fbla.game.ecs.component.MapComponent
 import me.srikavin.fbla.game.ecs.component.Transform
 
 
-@All(Map::class, Transform::class)
+/**
+ * Responsible for rendering the background of the map. A parallax effect is employed for the `Background` layer, if it
+ * exists.
+ */
+@All(MapComponent::class, Transform::class)
 class BackgroundRenderSystem : IteratingSystem() {
-    private lateinit var mapMapper: ComponentMapper<Map>
+    private lateinit var mapComponentMapper: ComponentMapper<MapComponent>
     private lateinit var transformMapper: ComponentMapper<Transform>
 
     @Wire
-    lateinit var camera: OrthographicCamera
+    private lateinit var camera: OrthographicCamera
     @Wire
     private lateinit var batch: SpriteBatch
 
     private lateinit var mapRenderer: OrthogonalTiledMapRenderer
-
     private val bgCamera = OrthographicCamera()
 
     override fun initialize() {
-        super.initialize()
         mapRenderer = OrthogonalTiledMapRenderer(null, 1 / 32f, batch)
     }
 
     override fun begin() {
         bgCamera.position.set(camera.position).scl(0.40f, 1f, 1f).add(30f, 0f, 0f)
         bgCamera.direction.set(camera.direction)
-        bgCamera.zoom = camera.zoom * 1.25f
+        bgCamera.zoom = camera.zoom
         bgCamera.viewportHeight = camera.viewportHeight
         bgCamera.viewportWidth = camera.viewportWidth
         bgCamera.update()
@@ -50,8 +52,9 @@ class BackgroundRenderSystem : IteratingSystem() {
 
     override fun process(entityId: Int) {
         val transform = transformMapper[entityId]
-        val map = mapMapper[entityId].map
+        val map = mapComponentMapper[entityId].map
 
+        // cache the map layers to avoid performance impacts
         if (!this::map.isInitialized || this.map != map) {
             this.map = map
             layers.clear()

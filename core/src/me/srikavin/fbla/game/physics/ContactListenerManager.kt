@@ -5,9 +5,18 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse
 import com.badlogic.gdx.physics.box2d.ContactListener
 import com.badlogic.gdx.physics.box2d.Manifold
 
+/**
+ * This class serves as the root physics contact listener. By default, it takes no actions. Instead, it delegates all
+ * events to registered [ContactListener]s.
+ */
 class ContactListenerManager : ContactListener {
     private val listeners: MutableList<ContactListener> = ArrayList(2)
 
+    /**
+     * Register a contact listener to be called with every physics contact event
+     *
+     * @param listener The listener to register
+     */
     fun addListener(listener: ContactListener) {
         listeners.add(listener)
     }

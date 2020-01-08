@@ -1,9 +1,9 @@
 package me.srikavin.fbla.game.map
 
+import com.artemis.Aspect
 import com.artemis.World
 import com.artemis.managers.TagManager
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.maps.MapLayer
@@ -15,13 +15,12 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
-import ktx.log.debug
+import ktx.assets.disposeSafely
 import ktx.log.error
 import ktx.log.info
 import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.GdxArray
 import me.srikavin.fbla.game.ecs.component.*
-import me.srikavin.fbla.game.ecs.component.Map
 import me.srikavin.fbla.game.ecs.component.Transform
 import me.srikavin.fbla.game.ecs.system.CameraFollowSystem
 import me.srikavin.fbla.game.graphics.SpritesheetLoader
@@ -32,7 +31,19 @@ private const val COLLISION_LAYER_NAME = "Collision"
 private const val TRIGGER_LAYER_NAME = "Trigger"
 private const val MAP_SCALE_FACTOR = 1 / 32f
 
-class MapLoader(private val assetManager: AssetManager, private val world: World) {
+/**
+ * Responsible for loading maps and their associated assets as well as spawning players. Tiled Maps that are to be loaded
+ * may contain any of the following layers:
+ *  * Foreground
+ *  * Background
+ *  * Collision - Contains all collision boxes on the map
+ *  * Trigger - Contains all map triggers and their associated properties; all objects in this layer must have the property
+ *  `type` with a value defined in [TriggerType]. All triggers must be [RectangleMapObject]s.
+ */
+class MapLoader {
+    /**
+     * Recycled [Vector2] to improve performance and avoid allocating unnecessary objects
+     */
     private val recycledVector2 = Vector2()
     private val spritesheetLoader = SpritesheetLoader()
     private val recycledFloatArray = FloatArray(6)
@@ -41,8 +52,10 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
     private val coinSprite: TextureRegion = TextureRegion(Texture(Gdx.files.internal("assets/graphics/entity/coinGold.png")))
 
 
-    private fun createPlayer(pos: Vector2) {
-
+    /**
+     * Creates a player entity with the given world and given position
+     */
+    private fun createPlayer(world: World, pos: Vector2) {
         world.getSystem(CameraFollowSystem::class.java).camera.position.y = pos.y + 5
 
         val e = world.createEntity().edit()
@@ -50,9 +63,9 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
                     shape = PolygonShape().apply {
                         setAsBox(.6f, 1f)
                     }
-                    restitution = 0f
+                    restitution = 0.1f
                     density = 1f
-                    friction = 0.2f
+                    friction = 0.1f
                 })
                 .add(PlayerControlled())
                 .add(SpriteOffset(Vector2(-.75f, -1f)))
@@ -64,7 +77,10 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
         world.getSystem(TagManager::class.java).register("PLAYER", e)
     }
 
-    private fun createCoin(pos: Vector2) {
+    /**
+     * Creates a coin entity with the given world and given position
+     */
+    private fun createCoin(world: World, pos: Vector2) {
         world.createEntity().edit()
                 .add(Transform().apply { position = pos })
                 .add(Sprite().apply { sprite = coinSprite })
@@ -80,7 +96,27 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
 
     }
 
-    fun loadMap(path: String): EntityInt {
+    /**
+     * Loads a map into the given world from the file specified. *All previous entities in the map will be removed.* A
+     * player entity will be spawned where a trigger of type `spawn` is found.
+     *
+     * @param world The world to create entities in
+     * @param path The path to load maps from
+     *
+     * @return The id of the created [MapComponent]
+     */
+    fun loadMap(world: World, path: String): EntityInt {
+        // Unload previously loaded maps
+        val entities = world.aspectSubscriptionManager[Aspect.all()].entities
+        val loadedMapMapper = world.getMapper(MapComponent::class.java)
+
+        for (i in 0 until entities.size()) {
+            if (loadedMapMapper.has(entities[i])) {
+                loadedMapMapper[entities[i]].map.disposeSafely()
+            }
+            world.delete(entities[i])
+        }
+
         val map = TmxMapLoader().load(path, TmxMapLoader.Parameters().apply {
             generateMipMaps = true
             textureMagFilter = Texture.TextureFilter.MipMapNearestNearest
@@ -88,18 +124,10 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
         })
 
 
-//        val entities = world.aspectSubscriptionManager[Aspect.all()].entities
-
-//        for (i in 0 until entities.size()) {
-//            info { i.toString() }
-//            world.delete(entities[i])
-//        }
-//        world.entityManager.reset()
-
         val mapEntity: EntityInt = world.create()
         val editor = world.edit(mapEntity)
 
-        editor.add(Transform()).add(Map().apply { this.map = map; this.scaleFactor = MAP_SCALE_FACTOR })
+        editor.add(Transform()).add(MapComponent().apply { this.map = map; this.scaleFactor = MAP_SCALE_FACTOR })
 
         val triggerLayer: MapLayer? = map.layers.get(TRIGGER_LAYER_NAME)
 
@@ -113,7 +141,7 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
 
         for (mapObject: MapObject in triggerLayer.objects) {
             if (mapObject is RectangleMapObject) {
-                debug { "Processing Trigger at ${mapObject.rectangle.x},${mapObject.rectangle.y} in $path" }
+                info { "Processing Trigger at ${mapObject.rectangle.x},${mapObject.rectangle.y} in $path" }
                 when (mapObject.properties?.get("type")) {
                     "spawn" -> {
                         playerPosition.x = mapObject.rectangle.x
@@ -122,20 +150,23 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
                     }
                     "coin" -> {
                         val pos = Vector2()
-                        createCoin(mapObject.rectangle.getPosition(pos).scl(MAP_SCALE_FACTOR))
+                        createCoin(world, mapObject.rectangle.getPosition(pos).scl(MAP_SCALE_FACTOR))
                         info { "Making coin at $pos" }
                     }
                     else -> {
                         val rect = mapObject.rectangle
+
                         world.createEntity().edit()
+                                .add(Transform())
                                 .add(PhysicsBody().apply {
                                     shape = PolygonShape().apply {
                                         setAsBox(rect.width * MAP_SCALE_FACTOR * .5f, rect.height * MAP_SCALE_FACTOR * .5f,
                                                 rect.getCenter(recycledVector2).scl(MAP_SCALE_FACTOR), 0f)
                                     }
+                                    type = BodyDef.BodyType.StaticBody
                                 })
                                 .add(MapTrigger().apply {
-                                    //                                    type = TriggerType.valueOf(mapObject.properties.get("type").toString())
+                                    type = TriggerType.valueOf(mapObject.properties.get("type").toString().toUpperCase())
                                     properties = mapObject.properties
                                 })
                     }
@@ -145,7 +176,7 @@ class MapLoader(private val assetManager: AssetManager, private val world: World
             }
         }
 
-        createPlayer(playerPosition.scl(MAP_SCALE_FACTOR))
+        createPlayer(world, playerPosition.scl(MAP_SCALE_FACTOR))
 
         if (!spawnTriggerFound) {
             error { throw RuntimeException("No Spawn trigger found in $path") }

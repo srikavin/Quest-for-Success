@@ -4,5 +4,5 @@ import com.artemis.Component
 import me.srikavin.fbla.game.minigame.Minigame
 
 class MinigameComponent : Component() {
-    val minigame: Minigame? = null
+    var minigame: Minigame? = null
 }

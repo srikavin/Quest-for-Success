@@ -1,11 +1,10 @@
 package me.srikavin.fbla.game.ecs.system
 
+import com.artemis.BaseEntitySystem
 import com.artemis.ComponentMapper
 import com.artemis.annotations.All
 import com.artemis.annotations.Wire
 import com.artemis.managers.TagManager
-import com.artemis.systems.IteratingSystem
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.physics.box2d.*
 import me.srikavin.fbla.game.EntityInt
@@ -16,33 +15,49 @@ import me.srikavin.fbla.game.trigger.TriggerManager
 
 
 @All(MapTrigger::class, PhysicsBody::class)
-class TriggerSystem(private val listenerManager: ContactListenerManager) : IteratingSystem() {
+class TriggerSystem(private val listenerManager: ContactListenerManager) : BaseEntitySystem() {
     private lateinit var triggerMapper: ComponentMapper<MapTrigger>
     private lateinit var physicsMapper: ComponentMapper<PhysicsBody>
 
+    data class TriggerEvent(val player: EntityInt, val other: EntityInt)
+
     private val triggerManager = TriggerManager()
+
+    private val collisions: MutableSet<TriggerEvent> = HashSet()
 
     @Wire
     lateinit var camera: OrthographicCamera
 
     inner class CollisionListener : ContactListener {
-        override fun endContact(contact: Contact?) {
+        override fun endContact(contact: Contact) {
+            val playerId = world.getSystem(TagManager::class.java).getEntityId("PLAYER")
+
+            val other: Fixture = when {
+                contact.fixtureA.userData == playerId -> {
+                    contact.fixtureB
+                }
+                contact.fixtureB.userData == playerId -> {
+                    contact.fixtureA
+                }
+                else -> {
+                    // Does not involve player
+                    return
+                }
+            }
+
+            val e: EntityInt = other.userData as Int
+            collisions.remove(TriggerEvent(playerId, e))
         }
 
         override fun beginContact(contact: Contact) {
             val playerId = world.getSystem(TagManager::class.java).getEntityId("PLAYER")
 
-            val player: Fixture
-            val other: Fixture
-
-            when {
+            val other = when {
                 contact.fixtureA.userData == playerId -> {
-                    player = contact.fixtureA
-                    other = contact.fixtureB
+                    contact.fixtureB
                 }
                 contact.fixtureB.userData == playerId -> {
-                    player = contact.fixtureB
-                    other = contact.fixtureA
+                    contact.fixtureA
                 }
                 else -> {
                     // Does not involve player
@@ -52,12 +67,7 @@ class TriggerSystem(private val listenerManager: ContactListenerManager) : Itera
 
             val e: EntityInt = other.userData as Int
             if (triggerMapper.has(e)) {
-                val trigger = triggerMapper[e]
-
-                // Handle outside of physics simulation
-                Gdx.app.postRunnable {
-                    triggerManager.handle(world, e, other.userData as Int, trigger)
-                }
+                collisions.add(TriggerEvent(playerId, e))
             }
 
         }
@@ -75,9 +85,11 @@ class TriggerSystem(private val listenerManager: ContactListenerManager) : Itera
         listenerManager.addListener(CollisionListener())
     }
 
-    override fun begin() {
-    }
-
-    override fun process(entityId: Int) {
+    override fun processSystem() {
+        collisions.forEach {
+            if (triggerMapper.has(it.other)) {
+                triggerManager.handle(world, it.player, it.other, triggerMapper[it.other])
+            }
+        }
     }
 }

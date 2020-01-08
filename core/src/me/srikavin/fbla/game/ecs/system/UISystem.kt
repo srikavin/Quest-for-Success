@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.rafaskoberg.gdx.typinglabel.TypingConfig
-import me.srikavin.fbla.game.ecs.component.PhysicsBody
+import me.srikavin.fbla.game.GameState
 import me.srikavin.fbla.game.ecs.component.Transform
 
 class UISystem : BaseSystem() {
@@ -23,13 +23,16 @@ class UISystem : BaseSystem() {
 
     @Wire
     lateinit var tranformMapper: ComponentMapper<Transform>
-    lateinit var bodyMapper: ComponentMapper<PhysicsBody>
     @Wire
     lateinit var skin: Skin
+    @Wire
+    lateinit var gameState: GameState
 
     override fun initialize() {
         super.initialize()
         TypingConfig.DEFAULT_SPEED_PER_CHAR = 0.05f
+
+        Gdx.input.inputProcessor = stage
 
         fpsCell = root.add("60")
     }
@@ -39,7 +42,7 @@ class UISystem : BaseSystem() {
 
 
 //        cell.actor.setText("Velocty: ${bodyMapper[player].body.linearVelocity}")
-        fpsCell.actor.setText("Position: ${tranformMapper[player].position}")
+        fpsCell.actor.setText("Score: ${gameState.score}")
 
         stage.act(Gdx.graphics.deltaTime)
         stage.draw()

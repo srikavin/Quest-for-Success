@@ -13,17 +13,19 @@ import ktx.log.debug
 import me.srikavin.fbla.game.dialogue.DialogueManager
 import me.srikavin.fbla.game.ecs.component.DialogueComponent
 
+/**
+ * Handles communication between a [DialogueManager] and a [DialogueComponent] entity.
+ */
 @One(DialogueComponent::class)
 class DialogueSystem : BaseEntitySystem() {
     @Wire
-    lateinit var stage: Stage
+    internal lateinit var stage: Stage
     @Wire
-    lateinit var skin: Skin
-
-    lateinit var dialogueManager: DialogueManager
-
+    internal lateinit var skin: Skin
     @Wire
-    lateinit var mapper: ComponentMapper<DialogueComponent>
+    private lateinit var mapper: ComponentMapper<DialogueComponent>
+
+    private lateinit var dialogueManager: DialogueManager
 
     override fun initialize() {
         super.initialize()
@@ -34,7 +36,6 @@ class DialogueSystem : BaseEntitySystem() {
     }
 
     private inner class SubscriptionListener : EntitySubscription.SubscriptionListener {
-
         override fun inserted(entities: IntBag) {
             for (i in 0 until entities.size()) {
                 val e = entities[i]
@@ -53,13 +54,12 @@ class DialogueSystem : BaseEntitySystem() {
             for (i in 0 until entities.size()) {
                 val e = entities[i]
 
-                mapper[e].channel.close()
                 if (mapper[e] == dialogueManager.component) {
                     dialogueManager.component = null
                 }
+                mapper[e].channel.close()
             }
         }
-
     }
 
     override fun processSystem() {

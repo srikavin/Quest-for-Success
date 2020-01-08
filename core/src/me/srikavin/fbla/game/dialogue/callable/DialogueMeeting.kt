@@ -6,10 +6,7 @@ class DialogueMeeting : DialogueCallable() {
 
     override fun run() {
         say("Why are you here?")
-        println(0)
         var index = getResponse(listOf("I'm here to ask if you want to go to a meeting for FBLA", "I forgot"))
-
-        println(1)
 
         if (index == 0) {
             updateScore(+1)
@@ -18,7 +15,6 @@ class DialogueMeeting : DialogueCallable() {
             updateScore(-1)
             say("Forgot what?")
         }
-
 
 
         say("The FBLA meeting is tomorrow!")
@@ -73,7 +69,7 @@ class DialogueMeeting : DialogueCallable() {
         }
 
 
-        var score = getScore()
+        val score = getScore()
         if (score > 0) {
             say("Well, I think I might just tag along.")
         } else if (score <= 0) {
