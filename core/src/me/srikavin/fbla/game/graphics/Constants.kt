@@ -10,3 +10,5 @@ const val scale_factor = 0.05f
  * @see [me.srikavin.fbla.game.ecs.system.InputSystem]
  */
 const val player_foot_fixture_id = -105
+
+const val MAP_SCALE_FACTOR = 1 / 32f

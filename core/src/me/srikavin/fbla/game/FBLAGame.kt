@@ -108,6 +108,7 @@ class FBLAGame : ApplicationAdapter() {
                 .register(root)
                 .register(gameState)
                 .register(mapLoader)
+                .register(listenerManager)
 
         world = World(config)
         mapLoader.loadMap(world, "assets/maps/level1.tmx")

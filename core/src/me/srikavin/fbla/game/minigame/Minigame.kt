@@ -44,6 +44,7 @@ abstract class Minigame {
         val subtype: String by MapTriggerDelegate("subtype")
         val minigameType: String by MapTriggerDelegate("minigame_type")
         val nextLevel: String by MapTriggerDelegate("next_level")
+        val message: String by MapTriggerDelegate("message")
     }
 
     /**

@@ -23,13 +23,13 @@ import me.srikavin.fbla.game.GdxArray
 import me.srikavin.fbla.game.ecs.component.*
 import me.srikavin.fbla.game.ecs.component.Transform
 import me.srikavin.fbla.game.ecs.system.CameraFollowSystem
+import me.srikavin.fbla.game.graphics.MAP_SCALE_FACTOR
 import me.srikavin.fbla.game.graphics.SpritesheetLoader
 import me.srikavin.fbla.game.trigger.TriggerType
 
 
 private const val COLLISION_LAYER_NAME = "Collision"
 private const val TRIGGER_LAYER_NAME = "Trigger"
-private const val MAP_SCALE_FACTOR = 1 / 32f
 
 typealias TriggerProcessor = (mapObject: RectangleMapObject, type: String, path: String) -> Unit
 
