@@ -52,8 +52,8 @@ class MapLoader {
     private val playerAnimations = spritesheetLoader.loadAsespriteSheet("assets/graphics/characters/David.png",
             "assets/graphics/characters/David.json")
     private val coinSprite: TextureRegion = TextureRegion(Texture(Gdx.files.internal("assets/graphics/entity/coinGold.png")))
-    private val defaultTriggerProcessor: TriggerProcessor = { mapObject, _, path ->
-        error { throw RuntimeException("Spawn is of type ${mapObject.javaClass.name} instead of RectangleMapObject in $path") }
+    private val defaultTriggerProcessor: TriggerProcessor = { _, type, _ ->
+        error { throw RuntimeException("Unknown trigger type $type") }
     }
 
     enum class UnloadType {
@@ -179,22 +179,22 @@ class MapLoader {
                         createCoin(world, mapObject.rectangle.getPosition(pos).scl(MAP_SCALE_FACTOR))
                         info { "Making coin at $pos" }
                     }
-                    TriggerType.values().any { it.name == type.toUpperCase() } -> {
-                        val rect = mapObject.rectangle
+                    type == "damage" -> {
+//                        val rect = mapObject.rectangle
 
-                        world.createEntity().edit()
-                                .add(Transform().apply { position = rect.getCenter(recycledVector2).scl(MAP_SCALE_FACTOR).cpy() })
-                                .add(PhysicsBody().apply {
-                                    shape = PolygonShape().apply {
-                                        setAsBox(rect.width * MAP_SCALE_FACTOR * .5f, rect.height * MAP_SCALE_FACTOR * .5f,
-                                                recycledVector2.setZero(), 0f)
-                                    }
-                                    this.type = BodyDef.BodyType.StaticBody
-                                })
-                                .add(MapTrigger().apply {
-                                    this.type = TriggerType.valueOf(type.toUpperCase())
-                                    properties = mapObject.properties
-                                })
+//                        world.createEntity().edit()
+//                                .add(Transform().apply { position = rect.getCenter(recycledVector2).scl(MAP_SCALE_FACTOR).cpy() })
+//                                .add(PhysicsBody().apply {
+//                                    shape = PolygonShape().apply {
+//                                        setAsBox(rect.width * MAP_SCALE_FACTOR * .5f, rect.height * MAP_SCALE_FACTOR * .5f,
+//                                                recycledVector2.setZero(), 0f)
+//                                    }
+//                                    this.type = BodyDef.BodyType.StaticBody
+//                                })
+//                                .add(MapTrigger().apply {
+//                                    this.type = TriggerType.valueOf(type.toUpperCase())
+//                                    properties = mapObject.properties
+//                                })
                     }
                     else -> {
                         customTriggerProcessor(mapObject, type, path)
