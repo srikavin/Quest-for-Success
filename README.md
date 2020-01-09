@@ -51,6 +51,7 @@ For more technical information, read `technical_readme.md`.
 ### Dependencies Used
  * [Kotlin](http://kotlinlang.org/) - used for null-safety and language features
  * [libgdx](https://libgdx.badlogicgames.com/) - used as a game programming and graphics framework
+ * [Artemis-ODB](https://github.com/junkdog/artemis-odb/) - used as a entity-component-system for organizing and managing entities
 
 ## Screenshots
 
