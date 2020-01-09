@@ -96,9 +96,9 @@ class PhysicsSystem(var physicsWorld: World, private val contactManager: Contact
                     val footBox = FixtureDef().apply {
                         //                        this.isSensor = true
                         this.shape = PolygonShape().apply {
-                            setAsBox(0.5f, 0.05f, Vector2(0f, -1f), 0f)
+                            setAsBox(0.55f, 0.05f, Vector2(0f, -1f), 0f)
                         }
-                        friction = 1f
+                        friction = .9f
                     }
 
                     val fixture = physics.body.createFixture(footBox)

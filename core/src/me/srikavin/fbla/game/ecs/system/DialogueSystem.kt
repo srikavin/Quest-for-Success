@@ -57,7 +57,6 @@ class DialogueSystem : BaseEntitySystem() {
                 if (mapper[e] == dialogueManager.component) {
                     dialogueManager.component = null
                 }
-                mapper[e].channel.close()
             }
         }
     }

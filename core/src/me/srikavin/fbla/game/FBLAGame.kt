@@ -53,7 +53,7 @@ class FBLAGame : ApplicationAdapter() {
         val assetManager = AssetManager()
         val batch = SpriteBatch()
 
-        val physicsWorld = com.badlogic.gdx.physics.box2d.World(Vector2(0f, -16f), true)
+        val physicsWorld = com.badlogic.gdx.physics.box2d.World(Vector2(0f, -23f), true)
 
         val generator = FreeTypeFontGenerator(Gdx.files.internal("assets/fonts/Kenney Pixel.ttf"))
         val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()

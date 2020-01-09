@@ -1,27 +1,89 @@
 package me.srikavin.fbla.game.minigame
 
+import com.artemis.World
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.maps.MapProperties
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import me.srikavin.fbla.game.MapTriggerDelegate
+import me.srikavin.fbla.game.map.MapLoader
 
+/**
+ * The baseclass that all minigames inherit from. This class handles level transitions and communications with outside
+ * systems. The field [mapProperties] is available to subclasses as a type-safe version of MapProperties.
+ */
 abstract class Minigame {
     /**
      * Stores whether the minigame is currently being played by the user.
      */
     var active: Boolean = false
+        private set
+
+    private var nextLevel: String = ""
 
     /**
-     * Reset the minigame to its initial conditions. This will always be called before a minigame is made active.
+     *  If a new map is loaded by a subclass, make sure to set [MapLoader.loadMap] with [MapLoader.UnloadType.NonMinigame]
+     *  to avoid unloading this minigame instance.
      */
-    abstract fun reset(properties: MapProperties)
+    protected lateinit var mapLoader: MapLoader
+
+    /**
+     * The entity-component-system world that can be used to create new entities.
+     */
+    protected lateinit var world: World
+
+    /**
+     * A type safe version of the MapProperties provided within the trigger object in the map.
+     */
+    protected lateinit var mapProperties: MapTriggerProperties
+
+    class MapTriggerProperties(val properties: MapProperties) {
+        val type: String by MapTriggerDelegate("type")
+        val subtype: String by MapTriggerDelegate("subtype")
+        val minigameType: String by MapTriggerDelegate("minigame_type")
+        val nextLevel: String by MapTriggerDelegate("next_level")
+    }
+
+    /**
+     * Reset the minigame to its initial conditions. This will always be called before [initialize].
+     */
+    fun reset(properties: MapProperties, world: World, mapLoader: MapLoader) {
+        this.mapProperties = MapTriggerProperties(properties)
+        this.nextLevel = mapProperties.nextLevel
+        this.mapLoader = mapLoader
+        this.world = world
+
+        resetMinigame(properties)
+    }
+
+    /**
+     * Reset the minigame to its initial conditions. This will be called by [reset]
+     */
+    protected abstract fun resetMinigame(properties: MapProperties)
 
     /**
      * Any inital UI initialization should occur here. The stage will not be modified outside of the minigame while it
      * is active.
      */
-    abstract fun initalize(skin: Skin, stage: Stage)
+    fun initialize(skin: Skin, stage: Stage) {
+        active = true
+
+        initializeMinigame(skin, stage)
+    }
+
+    /**
+     * Immediately ends the minigame and transitions to the next level.
+     */
+    fun endMinigame() {
+        active = false
+        Gdx.app.postRunnable {
+            mapLoader.loadMap(world, "assets/maps/$nextLevel")
+        }
+    }
+
+    protected abstract fun initializeMinigame(skin: Skin, stage: Stage)
 
     /**
      * The stage will not be modified outside of the minigame while the minigame remains active. No references to the
@@ -50,3 +112,4 @@ abstract class Minigame {
         return false
     }
 }
+

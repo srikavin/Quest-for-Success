@@ -11,13 +11,14 @@ class TriggerManager {
     private val coinTriggerHandler = CoinTriggerHandler()
     private val transitionTriggerHandler = TransitionTriggerHandler()
     private val interactiveTriggerHandler = InteractiveTriggerHandler()
+    private val minigameTriggerHandler = MinigameTriggerHandler()
 
     fun handle(world: World, player: EntityInt, triggerEntity: EntityInt, trigger: MapTrigger) {
         when (trigger.type) {
             TriggerType.COIN -> coinTriggerHandler.run(world, player, triggerEntity, trigger)
             TriggerType.TRANSITION -> transitionTriggerHandler.run(world, player, triggerEntity, trigger)
             TriggerType.INTERACTIVE -> interactiveTriggerHandler.run(world, player, triggerEntity, trigger)
-            TriggerType.MINIGAME -> TODO()
+            TriggerType.MINIGAME -> minigameTriggerHandler.run(world, player, triggerEntity, trigger)
         }
     }
 }

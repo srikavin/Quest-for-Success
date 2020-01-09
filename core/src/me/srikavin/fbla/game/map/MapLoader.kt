@@ -31,6 +31,8 @@ private const val COLLISION_LAYER_NAME = "Collision"
 private const val TRIGGER_LAYER_NAME = "Trigger"
 private const val MAP_SCALE_FACTOR = 1 / 32f
 
+typealias TriggerProcessor = (mapObject: RectangleMapObject, type: String, path: String) -> Unit
+
 /**
  * Responsible for loading maps and their associated assets as well as spawning players. Tiled Maps that are to be loaded
  * may contain any of the following layers:
@@ -50,7 +52,21 @@ class MapLoader {
     private val playerAnimations = spritesheetLoader.loadAsespriteSheet("assets/graphics/characters/David.png",
             "assets/graphics/characters/David.json")
     private val coinSprite: TextureRegion = TextureRegion(Texture(Gdx.files.internal("assets/graphics/entity/coinGold.png")))
+    private val defaultTriggerProcessor: TriggerProcessor = { mapObject, _, path ->
+        error { throw RuntimeException("Spawn is of type ${mapObject.javaClass.name} instead of RectangleMapObject in $path") }
+    }
 
+    enum class UnloadType {
+        /**
+         * Unloads all objects in a level
+         */
+        ALL,
+        /**
+         * Unloads all objects without the component []
+         */
+        NonMinigame,
+        NONE
+    }
 
     /**
      * Creates a player entity with the given world and given position
@@ -61,14 +77,14 @@ class MapLoader {
         val e = world.createEntity().edit()
                 .add(PhysicsBody().apply {
                     shape = PolygonShape().apply {
-                        setAsBox(.6f, 1f)
+                        setAsBox(.6f, .9f)
                     }
                     restitution = 0.1f
                     density = 1f
                     friction = 0.1f
                 })
                 .add(PlayerControlled())
-                .add(SpriteOffset(Vector2(-.75f, -1f)))
+                .add(SpriteOffset(Vector2(-.75f, -1.1f)))
                 .add(Transform().apply { position = pos })
                 .add(SwitchableAnimation().apply { animations = playerAnimations; currentState = "Stand" })
                 .add(FixedRotation())
@@ -102,19 +118,28 @@ class MapLoader {
      *
      * @param world The world to create entities in
      * @param path The path to load maps from
+     * @param unload Whether or not to unload previous maps
+     * @param customTriggerProcessor A [TriggerProcessor] to handle triggers unknown to this MapLoader
      *
      * @return The id of the created [MapComponent]
      */
-    fun loadMap(world: World, path: String): EntityInt {
-        // Unload previously loaded maps
-        val entities = world.aspectSubscriptionManager[Aspect.all()].entities
-        val loadedMapMapper = world.getMapper(MapComponent::class.java)
+    fun loadMap(world: World, path: String, unload: UnloadType = UnloadType.ALL,
+                customTriggerProcessor: TriggerProcessor = defaultTriggerProcessor): EntityInt {
+        if (unload == UnloadType.ALL || unload == UnloadType.NonMinigame) {
+            // Unload previously loaded maps
+            val entities = world.aspectSubscriptionManager[Aspect.all()].entities
+            val loadedMapMapper = world.getMapper(MapComponent::class.java)
+            val minigameMapper = world.getMapper(MinigameComponent::class.java)
 
-        for (i in 0 until entities.size()) {
-            if (loadedMapMapper.has(entities[i])) {
-                loadedMapMapper[entities[i]].map.disposeSafely()
+            for (i in 0 until entities.size()) {
+                if (unload == UnloadType.NonMinigame && minigameMapper.has(entities[i])) {
+                    continue
+                }
+                if (loadedMapMapper.has(entities[i])) {
+                    loadedMapMapper[entities[i]].map.disposeSafely()
+                }
+                world.delete(entities[i])
             }
-            world.delete(entities[i])
         }
 
         val map = TmxMapLoader().load(path, TmxMapLoader.Parameters().apply {
@@ -142,33 +167,37 @@ class MapLoader {
         for (mapObject: MapObject in triggerLayer.objects) {
             if (mapObject is RectangleMapObject) {
                 info { "Processing Trigger at ${mapObject.rectangle.x},${mapObject.rectangle.y} in $path" }
-                when (mapObject.properties?.get("type")) {
-                    "spawn" -> {
+                val type = mapObject.properties?.get("type").toString()
+                when {
+                    type == "spawn" -> {
                         playerPosition.x = mapObject.rectangle.x
                         playerPosition.y = mapObject.rectangle.y
                         spawnTriggerFound = true
                     }
-                    "coin" -> {
+                    type == "coin" -> {
                         val pos = Vector2()
                         createCoin(world, mapObject.rectangle.getPosition(pos).scl(MAP_SCALE_FACTOR))
                         info { "Making coin at $pos" }
                     }
-                    else -> {
+                    TriggerType.values().any { it.name == type.toUpperCase() } -> {
                         val rect = mapObject.rectangle
 
                         world.createEntity().edit()
-                                .add(Transform())
+                                .add(Transform().apply { position = rect.getCenter(recycledVector2).scl(MAP_SCALE_FACTOR).cpy() })
                                 .add(PhysicsBody().apply {
                                     shape = PolygonShape().apply {
                                         setAsBox(rect.width * MAP_SCALE_FACTOR * .5f, rect.height * MAP_SCALE_FACTOR * .5f,
-                                                rect.getCenter(recycledVector2).scl(MAP_SCALE_FACTOR), 0f)
+                                                recycledVector2.setZero(), 0f)
                                     }
-                                    type = BodyDef.BodyType.StaticBody
+                                    this.type = BodyDef.BodyType.StaticBody
                                 })
                                 .add(MapTrigger().apply {
-                                    type = TriggerType.valueOf(mapObject.properties.get("type").toString().toUpperCase())
+                                    this.type = TriggerType.valueOf(type.toUpperCase())
                                     properties = mapObject.properties
                                 })
+                    }
+                    else -> {
+                        customTriggerProcessor(mapObject, type, path)
                     }
                 }
             } else {
@@ -265,7 +294,6 @@ class MapLoader {
         info { fixtureDefs.toString() }
         info { collisionLayer.objects.count.toString() }
         editor.add(PhysicsBody(fixtureDefs, BodyDef.BodyType.StaticBody, 0f, 0.2f, 0f))
-        editor.entity
 
         return mapEntity
     }

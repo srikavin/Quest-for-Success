@@ -20,7 +20,7 @@ import me.srikavin.fbla.game.graphics.player_foot_fixture_id
 import me.srikavin.fbla.game.physics.ContactListenerManager
 
 private const val MAX_HORIZONTAL_VELOCITY = 7f
-private val JUMP_IMPULSE = Vector2(0.0f, 25.0f)
+private val JUMP_IMPULSE = Vector2(0.0f, 30.0f)
 private val LEFT_FORCE = Vector2(-50f, 0.0f)
 private val RIGHT_FORCE = Vector2(50f, 0.0f)
 

@@ -40,7 +40,7 @@ class MinigameRenderSystem : IteratingSystem() {
             override fun inserted(entities: IntBag) {
                 for (i in 0 until entities.size()) {
                     val e: EntityInt = entities[i]
-                    minigameMapper[e].minigame?.initalize(skin, stage)
+                    minigameMapper[e].minigame?.initialize(skin, stage)
                             ?: info { "Minigame not initialized upon creation: ${minigameMapper[e]}" }
                 }
             }
@@ -65,6 +65,9 @@ class MinigameRenderSystem : IteratingSystem() {
             batch.projectionMatrix = camera.combined
 
             minigame.render(camera, batch, stage)
+
+            stage.act(Gdx.graphics.deltaTime)
+            stage.draw()
         }
     }
 

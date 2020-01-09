@@ -4,6 +4,7 @@ import com.artemis.World
 import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.ecs.component.MapTrigger
 import me.srikavin.fbla.game.ecs.component.MinigameComponent
+import me.srikavin.fbla.game.map.MapLoader
 import me.srikavin.fbla.game.minigame.MinigameManager
 
 /**
@@ -16,10 +17,12 @@ class MinigameTriggerHandler : TriggerHandler {
         // Remove entity
         world.delete(triggerEntity)
 
-        val minigame = minigameManager.getMinigame(trigger.properties["name"] as String)
-        minigame.reset(trigger.properties)
+        val minigame = minigameManager.getMinigame(trigger.properties["minigame_type"] as String)
+        minigame.reset(trigger.properties, world, world.getRegistered(MapLoader::class.java))
 
         world.createEntity().edit()
                 .add(MinigameComponent().apply { this.minigame = minigame })
+
+        minigame.endMinigame()
     }
 }

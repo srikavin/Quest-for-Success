@@ -22,11 +22,11 @@ class QuizMinigame : Minigame() {
         inputs.add(Input.Keys.NUM_5)
     }
 
-    override fun reset(properties: MapProperties) {
+    override fun resetMinigame(properties: MapProperties) {
 
     }
 
-    override fun initalize(skin: Skin, stage: Stage) {
+    override fun initializeMinigame(skin: Skin, stage: Stage) {
         stage.root = Table(skin)
         stage.root.addActor(TypingLabel("Text", skin))
     }
