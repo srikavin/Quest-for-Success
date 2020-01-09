@@ -39,7 +39,7 @@ class DialogueMinigame : Minigame() {
     }
 
     override fun shouldRenderBackground(): Boolean {
-        return false
+        return true
     }
 
     override fun process(delta: Float) {
