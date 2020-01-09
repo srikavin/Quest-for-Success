@@ -1,5 +1,5 @@
 # The Quest for Success
-TODO - tagline/simple description
+This game is based around the adventure of an FBLA member on his journey to complete all the requirements of the business achievement award. Splitting education, progress, and service into each of their own mini-games for each tier of the award. This allows the player to understand the basic requirements of each tier by interacting directly with the objectives.
 
 ## Gameplay
 
