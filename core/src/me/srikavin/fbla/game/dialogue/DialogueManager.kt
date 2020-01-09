@@ -11,6 +11,7 @@ import com.rafaskoberg.gdx.typinglabel.TypingLabel
 import kotlinx.coroutines.channels.sendBlocking
 import ktx.actors.onClickEvent
 import me.srikavin.fbla.game.dialogue.callable.*
+import me.srikavin.fbla.game.dialogue.quiz.QuizFBLAKnowledge
 import me.srikavin.fbla.game.ecs.component.DialogueComponent
 
 /**
@@ -34,7 +35,8 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
                 "make_chapter" to DialogueMakeChapter(),
                 "job_interview" to DialogueJobInterview(),
                 "speech" to DialogueSpeech(),
-                "letter_rec" to DialogueLetterRec()
+                "letter_rec" to DialogueLetterRec(),
+                "fbla_knowledge" to QuizFBLAKnowledge()
         )
 
         /**
@@ -101,6 +103,7 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
             is EndDialoguePacket -> {
                 dialogueOptionsTable.clear()
                 dialogueText.setText("")
+                component.finished = true
             }
             else -> throw RuntimeException("Unknown packet ${packet.javaClass.name}")
         }

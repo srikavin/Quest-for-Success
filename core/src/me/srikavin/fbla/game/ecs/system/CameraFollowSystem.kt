@@ -13,7 +13,7 @@ import me.srikavin.fbla.game.ecs.component.Transform
  * @param followHorizontal Whether or not to follow the x-position of the player
  * @param followVertical Whether or not to follow the y-position of the player
  */
-class CameraFollowSystem(private val followVertical: Boolean = true, private val followHorizontal: Boolean = true) : BaseSystem() {
+class CameraFollowSystem(var followVertical: Boolean = true, var followHorizontal: Boolean = true) : BaseSystem() {
     @Wire
     private lateinit var transformMapper: ComponentMapper<Transform>
     @Wire
@@ -22,7 +22,7 @@ class CameraFollowSystem(private val followVertical: Boolean = true, private val
     override fun processSystem() {
         val player = world.getSystem(TagManager::class.java).getEntityId("PLAYER")
 
-        if (transformMapper.has(player)) {
+        if (player != -1 && transformMapper.has(player)) {
             val pos = transformMapper[player].position
             if (followHorizontal) {
                 camera.position.x = pos.x

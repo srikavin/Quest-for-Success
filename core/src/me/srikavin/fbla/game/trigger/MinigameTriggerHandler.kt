@@ -23,6 +23,6 @@ class MinigameTriggerHandler : TriggerHandler {
         world.createEntity().edit()
                 .add(MinigameComponent().apply { this.minigame = minigame })
 
-        minigame.endMinigame()
+//        minigame.endMinigame()
     }
 }

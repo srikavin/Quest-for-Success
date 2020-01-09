@@ -24,6 +24,9 @@ class UISystem : BaseSystem() {
     private lateinit var scoreCell: Cell<Label>
     private lateinit var livesCell: Cell<Label>
 
+    private var builder = StringBuilder("Score: ")
+    private var builderLives = StringBuilder("Lives: ")
+
     override fun initialize() {
         super.initialize()
         TypingConfig.DEFAULT_SPEED_PER_CHAR = 0.05f
@@ -31,6 +34,7 @@ class UISystem : BaseSystem() {
         Gdx.input.inputProcessor = stage
 
         scoreCell = root.add("")
+        root.row()
         livesCell = root.add("")
     }
 

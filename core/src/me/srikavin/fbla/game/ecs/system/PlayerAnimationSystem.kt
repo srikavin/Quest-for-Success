@@ -32,7 +32,7 @@ class PlayerAnimationSystem : BaseSystem() {
     override fun processSystem() {
         val player = world.getSystem(TagManager::class.java).getEntityId("PLAYER")
 
-        if (physicsBodyMapper.has(player) && switchableAnimationMapper.has(player)) {
+        if (player != -1 && physicsBodyMapper.has(player) && switchableAnimationMapper.has(player)) {
             val physicsBodyComponent = physicsBodyMapper[player]
             val switchableAnimation = switchableAnimationMapper[player]
             val vel = physicsBodyComponent.body.linearVelocity

@@ -2,11 +2,16 @@ package me.srikavin.fbla.game.trigger
 
 import com.artemis.World
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.ecs.component.MapTrigger
 import me.srikavin.fbla.game.ecs.component.Transform
@@ -26,6 +31,20 @@ class InteractiveTriggerHandler : TriggerHandler {
         font = generator.generateFont(parameter)
         generator.dispose()
     }
+
+    lateinit var skin: Skin
+    val dialog by lazy {
+        object : Dialog("Hint", skin) {
+            override fun result(obj: Any?) {
+                this.remove()
+            }
+        }.apply {
+            titleLabel.setFillParent(true)
+            button("Close")
+        }
+
+    }
+
 
     override fun run(world: World, player: EntityInt, triggerEntity: EntityInt, trigger: MapTrigger) {
         val positionMapper = world.getMapper(Transform::class.java)
@@ -49,5 +68,17 @@ class InteractiveTriggerHandler : TriggerHandler {
         }
 
         batch.projectionMatrix = camera.combined //revert projection
+
+
+        if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+            skin = world.getRegistered(Skin::class.java)
+            val stage = world.getRegistered(Stage::class.java)
+            dialog.contentTable.clear()
+            dialog.text(Label("\n" + trigger.properties["message"], skin, "black").apply {
+                this.setFontScale(.75f)
+            })
+
+            dialog.show(stage)
+        }
     }
 }

@@ -1,14 +1,13 @@
 package me.srikavin.fbla.game.minigame
 
+import me.srikavin.fbla.game.minigame.dialogue.DialogueMinigame
 import me.srikavin.fbla.game.minigame.dropcatch.DropcatchMinigame
-import me.srikavin.fbla.game.minigame.quiz.QuizMinigame
 
 class MinigameManager {
     private val minigames = mapOf(
-            "quiz" to QuizMinigame(),
+            "quiz" to DialogueMinigame(),
             "dropcatch" to DropcatchMinigame(),
-            "dialogue" to QuizMinigame(),
-            "buttonmash" to QuizMinigame()
+            "dialogue" to DialogueMinigame()
     )
 
     fun getMinigame(name: String): Minigame {

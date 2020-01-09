@@ -90,7 +90,6 @@ class InputSystem(private val listenerManager: ContactListenerManager) : Iterati
                             body.applyForceToCenter(RIGHT_FORCE, true)
                         }
                     }
-                    Actions.USE -> TODO()
                     Actions.QUIT -> {
                         Gdx.app.exit()
                     }
