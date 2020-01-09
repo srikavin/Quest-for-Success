@@ -53,7 +53,6 @@ class DropcatchMinigame : Minigame() {
         val table = Table(skin).center().bottom()
         table.setFillParent(true)
 
-        table.debug = true
         stage.addActor(table)
         itemsLeft = TypingLabel("Items Left: ?", skin)
         timeLeft = TypingLabel("Time Left: ?", skin)

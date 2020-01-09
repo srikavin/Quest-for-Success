@@ -78,7 +78,6 @@ class FBLAGame : ApplicationAdapter() {
 
         root.setFillParent(true)
         root.top().right()
-        root.debug = true
 
         val gameState = GameState(0)
 
@@ -99,7 +98,7 @@ class FBLAGame : ApplicationAdapter() {
                         DialogueSystem(),
                         TriggerSystem(listenerManager),
                         UISystem(),
-                        PhysicsDebugSystem(physicsWorld)
+                        PhysicsDebugSystem(physicsWorld, debug = false)
                 )
                 .with(TagManager())
                 .build()

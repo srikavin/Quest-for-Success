@@ -62,7 +62,6 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
         dialogueRoot = Table(skin)
         dialogueRoot.setFillParent(true)
         dialogueRoot.center().bottom()
-        dialogueRoot.debug = true
         dialogueRoot.add(dialogueTextContainer)
         dialogueRoot.row()
         dialogueRoot.add(dialogueOptionsTable)
