@@ -68,6 +68,8 @@ class MinigameRenderSystem : IteratingSystem() {
 
             stage.act(Gdx.graphics.deltaTime)
             stage.draw()
+        } else {
+            stage.clear()
         }
     }
 
