@@ -179,6 +179,23 @@ class MapLoader {
                         createCoin(world, mapObject.rectangle.getPosition(pos).scl(MAP_SCALE_FACTOR))
                         info { "Making coin at $pos" }
                     }
+                    TriggerType.values().any { it.name == type.toUpperCase() } -> {
+                        val rect = mapObject.rectangle
+
+                        world.createEntity().edit()
+                                .add(Transform().apply { position = rect.getCenter(recycledVector2).scl(MAP_SCALE_FACTOR).cpy() })
+                                .add(PhysicsBody().apply {
+                                    shape = PolygonShape().apply {
+                                        setAsBox(rect.width * MAP_SCALE_FACTOR * .5f, rect.height * MAP_SCALE_FACTOR * .5f,
+                                                recycledVector2.setZero(), 0f)
+                                    }
+                                    this.type = BodyDef.BodyType.StaticBody
+                                })
+                                .add(MapTrigger().apply {
+                                    this.type = TriggerType.valueOf(type.toUpperCase())
+                                    properties = mapObject.properties
+                                })
+                    }
                     type == "damage" -> {
 //                        val rect = mapObject.rectangle
 
