@@ -6,6 +6,7 @@ import com.artemis.managers.TagManager
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.assets.loaders.SkinLoader
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
 import com.badlogic.gdx.graphics.GL20
@@ -15,6 +16,8 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.Vector2
@@ -25,6 +28,7 @@ import com.badlogic.gdx.utils.ObjectMap
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ktx.actors.onClick
+import ktx.assets.disposeSafely
 import me.srikavin.fbla.game.Scene.PLAYING
 import me.srikavin.fbla.game.Scene.TITLE
 import me.srikavin.fbla.game.ecs.system.*
@@ -35,7 +39,8 @@ const val cameraScale = 45f
 
 enum class Scene {
     PLAYING,
-    TITLE
+    TITLE,
+    LOADING
 }
 
 class FBLAGame : ApplicationAdapter() {
@@ -43,8 +48,10 @@ class FBLAGame : ApplicationAdapter() {
     lateinit var world: World
     lateinit var batch: SpriteBatch
     lateinit var skin: Skin
+    var assetManager = AssetManager()
+    lateinit var splashImage: Texture
 
-    var scene: Scene = TITLE
+    private var scene: Scene = Scene.LOADING
 
     override fun resize(width: Int, height: Int) {
         if (scene == PLAYING) {
@@ -53,7 +60,7 @@ class FBLAGame : ApplicationAdapter() {
 
             camera.zoom = 1f
             camera.update()
-        } else {
+        } else if (scene == TITLE) {
             stageBg.viewport.update(width, height)
         }
     }
@@ -64,7 +71,6 @@ class FBLAGame : ApplicationAdapter() {
         camera.position.y = cameraScale * (9f / 16f) * 0.75f
 
         val physicsWorld = com.badlogic.gdx.physics.box2d.World(Vector2(0f, -23f), true)
-        batch = SpriteBatch()
 
         val stage = Stage(ExtendViewport(640f, 480f))
         val root = Table(skin)
@@ -108,29 +114,40 @@ class FBLAGame : ApplicationAdapter() {
                 .register(listenerManager)
 
         world = World(config)
-        mapLoader.loadMap(world, "assets/maps/level2.tmx")
+        mapLoader.loadMap(world, "assets/maps/level1.tmx")
     }
 
     private lateinit var titleBg: TextureRegion
     private lateinit var stageBg: Stage
 
     override fun create() {
-        val assetManager = AssetManager()
-        assetManager.setLoader(TiledMap::class.java, TmxMapLoader(InternalFileHandleResolver()))
+        batch = SpriteBatch()
+        splashImage = Texture(Gdx.files.internal("assets/graphics/titlelogo.png"))
 
-        val generator = FreeTypeFontGenerator(Gdx.files.internal("assets/fonts/Kenney Pixel.ttf"))
-        val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
-        parameter.size = 48
-        val font12: BitmapFont = generator.generateFont(parameter)
+        // Load necessary resources asynchronously
+        val resolver: FileHandleResolver = InternalFileHandleResolver()
+        assetManager.setLoader(TiledMap::class.java, TmxMapLoader(resolver))
+        assetManager.setLoader(FreeTypeFontGenerator::class.java, FreeTypeFontGeneratorLoader(resolver))
+        assetManager.setLoader(BitmapFont::class.java, ".ttf", FreetypeFontLoader(resolver))
+
+        val parameter = FreetypeFontLoader.FreeTypeFontLoaderParameter()
+        parameter.fontParameters.size = 48
+        parameter.fontFileName = "assets/fonts/Kenney Pixel.ttf"
+        assetManager.load("KenneyPixel48.ttf", BitmapFont::class.java, parameter)
+        val font = assetManager.finishLoadingAsset<BitmapFont>("KenneyPixel48.ttf")
 
         val fontMap = ObjectMap<String, Any>()
-        fontMap.put("KenneyPixel", font12)
-        generator.dispose()
+        fontMap.put("KenneyPixel", font)
 
         assetManager.load("assets/skin/skin.json", Skin::class.java, SkinLoader.SkinParameter(fontMap))
-        assetManager.finishLoading()
-        skin = assetManager.get<Skin>("assets/skin/skin.json")
+    }
 
+    fun afterLoad() {
+        skin = assetManager.get<Skin>("assets/skin/skin.json")
+        skin.add("KenneyPixel", assetManager.get("KenneyPixel48.ttf"))
+    }
+
+    fun initTitleScreen() {
         camera = OrthographicCamera(cameraScale, cameraScale * (9f / 16f))
         titleBg = TextureRegion(Texture(Gdx.files.internal("assets/graphics/homescreen.png")))
 
@@ -198,7 +215,6 @@ class FBLAGame : ApplicationAdapter() {
         vertGroup.addActor(instructions)
         vertGroup.addActor(exit)
         Gdx.input.inputProcessor = stageBg
-
         scene = TITLE
     }
 
@@ -210,19 +226,30 @@ class FBLAGame : ApplicationAdapter() {
             }
             TITLE -> {
                 Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
-                Gdx.gl.glClear(
-                        GL20.GL_COLOR_BUFFER_BIT
-                                or GL20.GL_DEPTH_BUFFER_BIT
-                                or (if (Gdx.graphics.bufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0)
-                )
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
                 stageBg.act()
                 stageBg.draw()
+            }
+            Scene.LOADING -> {
+                // Render splash image
+                Gdx.gl.glClearColor(20f, 20f, 20f, 1f)
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
+                batch.begin()
+                batch.draw(splashImage, (Gdx.graphics.width / 2f) - 128f, (Gdx.graphics.height / 2f) - 182f,
+                        256f, 264f)
+                batch.end()
+                // Continue loading resources
+                if (assetManager.update()) {
+                    afterLoad()
+                    initTitleScreen()
+                }
             }
         }
     }
 
     override fun dispose() {
+        assetManager.disposeSafely()
         world.dispose()
     }
 }

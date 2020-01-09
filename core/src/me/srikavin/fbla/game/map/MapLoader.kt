@@ -71,7 +71,7 @@ class MapLoader {
     /**
      * Creates a player entity with the given world and given position
      */
-    private fun createPlayer(world: World, pos: Vector2) {
+    fun createPlayer(world: World, pos: Vector2) {
         world.getSystem(CameraFollowSystem::class.java).camera.position.y = pos.y + 5
 
         val e = world.createEntity().edit()
@@ -88,6 +88,7 @@ class MapLoader {
                 .add(Transform().apply { position = pos })
                 .add(SwitchableAnimation().apply { animations = playerAnimations; currentState = "Stand" })
                 .add(FixedRotation())
+                .add(SpawnPoint(pos.cpy()))
                 .entity
 
         world.getSystem(TagManager::class.java).register("PLAYER", e)
@@ -195,23 +196,6 @@ class MapLoader {
                                     this.type = TriggerType.valueOf(type.toUpperCase())
                                     properties = mapObject.properties
                                 })
-                    }
-                    type == "damage" -> {
-//                        val rect = mapObject.rectangle
-
-//                        world.createEntity().edit()
-//                                .add(Transform().apply { position = rect.getCenter(recycledVector2).scl(MAP_SCALE_FACTOR).cpy() })
-//                                .add(PhysicsBody().apply {
-//                                    shape = PolygonShape().apply {
-//                                        setAsBox(rect.width * MAP_SCALE_FACTOR * .5f, rect.height * MAP_SCALE_FACTOR * .5f,
-//                                                recycledVector2.setZero(), 0f)
-//                                    }
-//                                    this.type = BodyDef.BodyType.StaticBody
-//                                })
-//                                .add(MapTrigger().apply {
-//                                    this.type = TriggerType.valueOf(type.toUpperCase())
-//                                    properties = mapObject.properties
-//                                })
                     }
                     else -> {
                         customTriggerProcessor(mapObject, type, path)

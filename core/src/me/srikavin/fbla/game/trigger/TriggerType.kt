@@ -7,5 +7,6 @@ enum class TriggerType {
     COIN,
     TRANSITION,
     INTERACTIVE,
-    MINIGAME
+    MINIGAME,
+    DAMAGE
 }

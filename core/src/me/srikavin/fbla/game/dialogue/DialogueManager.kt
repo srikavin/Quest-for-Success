@@ -36,11 +36,15 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
                 "job_interview" to DialogueJobInterview(),
                 "speech" to DialogueSpeech(),
                 "letter_rec" to DialogueLetterRec(),
-                "fbla_knowledge" to QuizFBLAKnowledge()
+                "fbla_knowledge" to QuizFBLAKnowledge(),
+                "animal" to DialogueAnimal(),
+                "brochure" to DialogueBrochure(),
+                "social_media" to DialogueSocialMedia(),
+                "blog" to DialogueBlog()
         )
 
         /**
-         * Gets the [DialogueCallable] associated with the given name
+         * Gets the [DialogueCallable] associated with a given name
          *
          * @param name The name of the Dialogue Callable to lookup
          */

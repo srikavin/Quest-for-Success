@@ -12,6 +12,7 @@ class TriggerManager {
     private val transitionTriggerHandler = TransitionTriggerHandler()
     private val interactiveTriggerHandler = InteractiveTriggerHandler()
     private val minigameTriggerHandler = MinigameTriggerHandler()
+    private val damageTriggerHandler = DamageTriggerHandler()
 
     fun handle(world: World, player: EntityInt, triggerEntity: EntityInt, trigger: MapTrigger) {
         when (trigger.type) {
@@ -19,6 +20,7 @@ class TriggerManager {
             TriggerType.TRANSITION -> transitionTriggerHandler.run(world, player, triggerEntity, trigger)
             TriggerType.INTERACTIVE -> interactiveTriggerHandler.run(world, player, triggerEntity, trigger)
             TriggerType.MINIGAME -> minigameTriggerHandler.run(world, player, triggerEntity, trigger)
+            TriggerType.DAMAGE -> damageTriggerHandler.run(world, player, triggerEntity, trigger)
         }
     }
 }

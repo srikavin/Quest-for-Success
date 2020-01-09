@@ -22,6 +22,10 @@ class TriggerSystem(private val listenerManager: ContactListenerManager) : BaseE
     private val triggerManager = TriggerManager()
     private val collisions: MutableSet<TriggerEvent> = HashSet()
 
+    fun removePlayerFromCollision(player: EntityInt) {
+        collisions.removeIf { it.player == player }
+    }
+
     inner class CollisionListener : ContactListener {
         override fun endContact(contact: Contact) {
             val playerId = world.getSystem(TagManager::class.java).getEntityId("PLAYER")
