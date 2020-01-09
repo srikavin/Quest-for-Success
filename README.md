@@ -7,7 +7,24 @@
 
 ## Topic Correlation
 
-This game is based around the adventure of an FBLA member on his journey to complete all the requirements of the business achievement award. Splitting education, progress, and service into each of their own mini-games for each tier of the award. This allows the player to understand the basic requirements of each tier by interacting directly with the objectives.
+This game is based around the adventure of an FBLA member on his journey to complete all the requirements of the business
+achievement award. Splitting education, progress, and service into each of their own mini-games for each tier of the award.
+This allows the player to understand the basic requirements of each tier by interacting directly with the objectives.
+
+A scoreboard is available, and the score is visible at all times during the game. Interactive hotkeys will be shown on 
+the screen when needed. The game can be played multiple times to discover multiple endings.
+
+
+## Features
+- Keyboard and mouse compatibility
+- Original art
+- 4 separate stages, each with three levels with increasing difficulty
+- A variety of separate mini-games.
+- Interactive dialogue
+- Enemies, lives, coins, and an overall score system.
+- An advanced platformer with the inclusion of puzzles to solve
+- Instructions page included on a menu page. 
+- Multiplayer 
 
 ### Controls
 
@@ -17,6 +34,7 @@ This game is based around the adventure of an FBLA member on his journey to comp
 | Move Up | *Up Arrow* |
 | Move Down | *Down Arrow* |
 | Move Right | *Right Arrow* |
+| Use | *E* |
 | Quit Game | *Escape* |
 
 ## Run Instructions
@@ -24,7 +42,9 @@ This game is based around the adventure of an FBLA member on his journey to comp
 Launch `quest.exe` in the [`game`](game) directory.
 
 ## Development Instructions
-For more technical information, read `technical_readme.md`.
+For more technical information, read `technical_readme.md`. Also view [javadocs (kDocs)](javadoc/index.html) in the 
+`javadoc` folder. Code is commented and should be fairly easy to understand. Advanced game rules are also featured
+within the source code.
 
 ### Running a Development Copy
 1. Open the `src` directory with an editor of your choice
@@ -55,4 +75,10 @@ For more technical information, read `technical_readme.md`.
 
 ## Screenshots
 
-TODO
+![](readme_assets/tiled_1.png)
+![](readme_assets/tiled_2.png)
+![](readme_assets/game1.png)
+![](readme_assets/game2.png)
+![](readme_assets/game3.png)
+![](readme_assets/tiled_1.png)
+![](readme_assets/tiled_2.png)
