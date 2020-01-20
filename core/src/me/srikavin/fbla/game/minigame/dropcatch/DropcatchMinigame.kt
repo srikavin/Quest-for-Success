@@ -46,7 +46,7 @@ class DropcatchMinigame : Minigame() {
     }
 
     override fun resetMinigame(properties: MapProperties) {
-
+        timeLeftVal = 60f
     }
 
     override fun initializeMinigame(skin: Skin, stage: Stage) {
