@@ -45,6 +45,7 @@ class DropcatchMinigame : Minigame() {
     private lateinit var table: Table
     private lateinit var infoPanel: Table
     private lateinit var container: Table
+    private lateinit var contactListener: ContactListener
 
     private var firstRender = true
     private var haveShownScoreboard = false
@@ -69,10 +70,12 @@ class DropcatchMinigame : Minigame() {
     override fun resetMinigame(properties: MapProperties) {
         goodItems.clear()
         badItems.clear()
-        timeLeftVal = 60f
+        timeLeftVal = 45f
         goodCollected = 0
+        goodItemsLeft = 0
         badCollected = 0
         firstRender = true
+        haveShownScoreboard = false
     }
 
     override fun initializeMinigame(skin: Skin, stage: Stage) {
@@ -101,11 +104,10 @@ class DropcatchMinigame : Minigame() {
         gameState = world.getRegistered(GameState::class.java)
 
         val mapper = world.getMapper(DropcatchItemComponent::class.java)
+
         val contactListenerManager = world.getRegistered(ContactListenerManager::class.java)
-        val physicsWorld = world.getRegistered(World::class.java)
 
-
-        contactListenerManager.addListener(object : ContactListener {
+        contactListener = object : ContactListener {
             override fun endContact(contact: Contact?) {
 
             }
@@ -146,7 +148,8 @@ class DropcatchMinigame : Minigame() {
 
             override fun postSolve(contact: Contact?, impulse: ContactImpulse?) {
             }
-        })
+        }
+        contactListenerManager.addListener(contactListener)
 
         val cache: ObjectMap<String, TextureRegion> = ObjectMap(2)
 
@@ -201,7 +204,7 @@ class DropcatchMinigame : Minigame() {
             table.isTransform = true
             container.isTransform = true
             table.sequence(
-                    Actions.moveTo(1920 / 2f - 150f, 1080 / 3f),
+                    Actions.moveTo(1920 / 2f - 150f, 1080 / 4f),
                     Actions.scaleTo(3f, 3f),
                     Actions.parallel(
                             Actions.moveTo(1920 / 2f, table.y, 2.5f, Interpolation.pow2In),
@@ -280,10 +283,14 @@ class DropcatchMinigame : Minigame() {
                 }
 
                 infoPanel.sequence(
-                        Actions.fadeIn(7f),
-                        Actions.fadeOut(3f),
+                        Actions.show(),
+                        Actions.fadeIn(3f),
+                        Actions.fadeIn(5f),
+                        Actions.fadeOut(2f),
                         Actions.hide(),
                         Actions.run {
+                            val contactListenerManager = world.getRegistered(ContactListenerManager::class.java)
+                            contactListenerManager.removeListener(contactListener)
                             Gdx.app.postRunnable {
                                 this.endMinigame()
                             }

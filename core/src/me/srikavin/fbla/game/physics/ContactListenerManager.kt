@@ -21,6 +21,15 @@ class ContactListenerManager : ContactListener {
         listeners.add(listener)
     }
 
+    /**
+     * Unregisters a given contact listener
+     *
+     * @param listener The listener to remove
+     */
+    fun removeListener(listener: ContactListener) {
+        listeners.remove(listener)
+    }
+
     override fun endContact(contact: Contact) {
         listeners.forEach {
             it.endContact(contact)
