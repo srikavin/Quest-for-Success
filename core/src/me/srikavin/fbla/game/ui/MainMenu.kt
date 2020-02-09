@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
+import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import ktx.actors.alpha
 import me.srikavin.fbla.game.GdxArray
@@ -22,8 +23,13 @@ import me.srikavin.fbla.game.registerInputHandler
 import me.srikavin.fbla.game.unregisterInputHandler
 
 class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : Disposable {
-    private val stage = Stage(ExtendViewport(1920f, 1080f))
+    private val stage = Stage(ExtendViewport(1920f, 1080f, 1920f, 1080f))
     private val container = Table(skin)
+    private val cloudContainer = Table(skin)
+    private val bgStack = Stack()
+    private val filterStack = Stack()
+
+
     private lateinit var submenu: Table
     private lateinit var infoPanel: Table
 
@@ -33,17 +39,27 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
     private val curButtons: GdxArray<Button> = GdxArray(8)
 
     private val logo: Drawable
+    private val fblaLogo: Drawable
     private val cloud: Drawable
     private val cloud2: Drawable
     private val cloud3: Drawable
 
     init {
         logo = TextureRegionDrawable(Texture(Gdx.files.internal("assets/graphics/titlelogopic.png")))
+        fblaLogo = TextureRegionDrawable(Texture(Gdx.files.internal("assets/graphics/fbla-logo.png")))
 
 
         cloud = TextureRegionDrawable(Texture(Gdx.files.internal("assets/graphics/backgrounds/cloud1.png")))
         cloud2 = TextureRegionDrawable(Texture(Gdx.files.internal("assets/graphics/backgrounds/cloud2.png")))
         cloud3 = TextureRegionDrawable(Texture(Gdx.files.internal("assets/graphics/backgrounds/cloud3.png")))
+
+        bgStack.add(Image(
+                TextureRegionDrawable(Texture(Gdx.files.internal("assets/graphics/backgrounds/backgroundColorGrassTiled.png"))), Scaling.fill))
+//        filterStack.add(Image(NinePatchDrawable(skin.getPatch("dark-filter"))))
+
+        stage.addActor(bgStack)
+        stage.addActor(cloudContainer)
+        stage.addActor(filterStack)
         stage.addActor(container)
         registerInputHandler(stage)
     }
@@ -55,17 +71,22 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
         currentPanel = null
         currentMenu = null
 
-        container.background = TextureRegionDrawable(Texture(Gdx.files.internal("assets/graphics/backgrounds/backgroundColorGrass.png")))
+        bgStack.setFillParent(true)
+        bgStack.setSize(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
+
+        filterStack.setFillParent(true)
+        filterStack.setSize(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
 
         container.setFillParent(true)
         container.setSize(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
 
         curButtons.clear()
         container.clear()
+        cloudContainer.clear()
 
         fun animateCloud(cloud: Drawable, duration: Float, offset: Float, vOffset: Float) {
             val actor = Image(cloud)
-            container.addActor(actor)
+            cloudContainer.addActor(actor)
 
             actor.addAction(Actions.repeat(RepeatAction.FOREVER,
                     Actions.sequence(
@@ -77,17 +98,15 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
         }
 
         animateCloud(cloud, 25f, 300f, 100f)
-        animateCloud(cloud, 17f, -1000f, 100f)
-        animateCloud(cloud2, 45f, -700f, -100f)
-        animateCloud(cloud3, 55f, 1000f, -50f)
-        animateCloud(cloud3, 15f, -1500f, -50f)
+        animateCloud(cloud2, 17f, 0f, 100f)
+        animateCloud(cloud3, 45f, 700f, -120f)
+        animateCloud(cloud, 35f, 500f, 0f)
 
 
         container.left()
-        container.add().width(Gdx.graphics.width / 10f)
+        container.add().width(Gdx.graphics.width / 15f)
 
         val width = 230f
-
 
         container.table(NinePatchDrawable(skin.getPatch("menu-button-bg"))) { t ->
             t.defaults().width(width).height(70f)
@@ -128,12 +147,12 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
             t.defaults().width(width).height(70f)
         }.width(width).growY()
 
-        container.add().width((Gdx.graphics.width - (Gdx.graphics.width / 10f + width * 2) - 700) / 2)
+        container.add().width((Gdx.graphics.width - (Gdx.graphics.width / 10f + width * 2) - 800) / 2)
 
         val infoContainer = container
                 .table {
-                    it.top().add(Image(logo)).height(250f).width(250 * 166 / 133f)
-                }.height(600f)
+                    it.top().add(Image(logo)).height(300f).width(300 * 166 / 133f)
+                }.height(550f)
                 .width(800f)
                 .pad(20f)
                 .top()
@@ -141,12 +160,19 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
 
         infoContainer.row()
 
-        infoPanel = infoContainer
-                .table(NinePatchDrawable(skin.getPatch("menu-button-bg")))
-                .width(550f)
-                .padTop(((Gdx.graphics.height - 170f) / 2) - 250f)
-                .growY()
-                .actor
+        infoContainer.table {
+            infoPanel = it.table(NinePatchDrawable(skin.getPatch("menu-button-bg")))
+                    .width(550f)
+                    .padTop(((Gdx.graphics.height - 170f) / 2) - 250f)
+                    .growY().actor
+        }.height(350f)
+
+        infoContainer.row()
+
+        infoContainer.table {
+            it.bottom().add(Image(fblaLogo)).height(300f).width(300 * 8000 / 4500f)
+                    .padTop(50f)
+        }
 
         infoPanel.alpha = 0f
     }

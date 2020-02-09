@@ -127,8 +127,6 @@ class MapLoader {
     fun loadMap(world: World, path: String, unload: UnloadType = UnloadType.ALL,
                 customTriggerProcessor: TriggerProcessor = defaultTriggerProcessor): EntityInt {
 
-        Throwable().printStackTrace()
-
         if (unload == UnloadType.ALL || unload == UnloadType.NonMinigame) {
             // Unload previously loaded maps
             val entities = world.aspectSubscriptionManager[Aspect.all()].entities

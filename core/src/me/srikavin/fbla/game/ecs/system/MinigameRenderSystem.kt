@@ -38,13 +38,14 @@ class MinigameRenderSystem : IteratingSystem() {
 
     override fun initialize() {
         super.initialize()
-        minigameStage = Stage(ExtendViewport(640f, 480f))
+        minigameStage = Stage(ExtendViewport(1920f, 1080f))
         registerInputHandler(minigameStage)
         subscription.addSubscriptionListener(object : EntitySubscription.SubscriptionListener {
             override fun inserted(entities: IntBag) {
                 for (i in 0 until entities.size()) {
                     val e: EntityInt = entities[i]
                     minigameStage.clear()
+                    minigameStage.viewport.update(Gdx.graphics.width, Gdx.graphics.height)
 
                     minigameMapper[e].minigame?.initialize(skin, minigameStage)
                             ?: info { "Minigame not initialized upon creation: ${minigameMapper[e]}" }
@@ -62,6 +63,7 @@ class MinigameRenderSystem : IteratingSystem() {
         val minigame = minigameComponent.minigame ?: return
 
         if (minigame.active) {
+            minigameStage.viewport.update(Gdx.graphics.width, Gdx.graphics.height, true)
             if (!minigame.shouldRenderBackground()) {
                 Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
