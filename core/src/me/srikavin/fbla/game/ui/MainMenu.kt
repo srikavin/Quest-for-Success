@@ -83,8 +83,6 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
         animateCloud(cloud3, 15f, -1500f, -50f)
 
 
-//        container.padLeft(10f)
-
         container.left()
         container.add().width(Gdx.graphics.width / 10f)
 
@@ -121,7 +119,7 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
                     Buttoni("Exit", null, Runnable { Gdx.app.exit() })
 
             )
-        }.width(width).growY()
+        }.width(width).padLeft(7f).growY()
 
         container.table(NinePatchDrawable(skin.getPatch("menu-button-bg"))) { t ->
             submenu = t
