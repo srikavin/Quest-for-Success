@@ -34,7 +34,7 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
                 "meeting" to DialogueMeeting(),
                 "make_chapter" to DialogueMakeChapter(),
                 "job_interview" to DialogueJobInterview(),
-                "speech" to DialogueSpeech(),
+                "office" to DialogueSpeech(),
                 "letter_rec" to DialogueLetterRec(),
                 "fbla_knowledge" to QuizFBLAKnowledge(),
                 "animal" to DialogueAnimal(),

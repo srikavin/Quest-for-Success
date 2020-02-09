@@ -52,7 +52,7 @@ class PhysicsSystem(var physicsWorld: World, private val contactManager: Contact
                 val bodyDef = BodyDef().apply {
                     type = physics.type
                     position.set(transform.position)
-                    linearDamping = physics.linearDamping
+//                    linearDamping = physics.linearDamping
                 }
                 physics.body = physicsWorld.createBody(bodyDef).apply {
                     userData = e

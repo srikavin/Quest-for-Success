@@ -3,6 +3,7 @@ package me.srikavin.fbla.game.trigger
 import com.artemis.World
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.TimeUtils
+import ktx.math.times
 import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.GameState
 import me.srikavin.fbla.game.ecs.component.MapTrigger
@@ -18,7 +19,7 @@ private const val INVULNERABLE_TIME_MSEC: Long = 500
  * Handles triggers resulting from player collision with coins.
  */
 class DamageTriggerHandler : TriggerHandler {
-    private val knockbackImpulse = Vector2(-30f, 35f)
+    private val knockbackImpulse = Vector2(30f, 50f)
     private var lastDamageTime = 0L
 
     override fun run(world: World, player: EntityInt, triggerEntity: EntityInt, trigger: MapTrigger) {
@@ -34,7 +35,12 @@ class DamageTriggerHandler : TriggerHandler {
 
         lastDamageTime = TimeUtils.millis()
         if (physicsMapper.has(player) && transformMapper.has(player)) {
-            physicsMapper[player].body.applyLinearImpulse(knockbackImpulse, transformMapper[player].position, true)
+            val pBody = physicsMapper[player].body
+            val tBody = physicsMapper[triggerEntity].body
+
+            val direction = pBody.position.sub(tBody.position).nor()
+
+            pBody.applyLinearImpulse(knockbackImpulse.times(direction), transformMapper[player].position, true)
         }
 
         if (gameState.lives <= 0) {

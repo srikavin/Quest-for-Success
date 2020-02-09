@@ -44,7 +44,7 @@ typealias TriggerProcessor = (mapObject: RectangleMapObject, type: String, path:
  */
 class MapLoader {
     /**
-     * Recycled [Vector2] to improve performance and avoid allocating unnecessary objects
+     * Recycled [Vector2] to improve performance by avoiding the allocation of unnecessary objects
      */
     private val recycledVector2 = Vector2()
     private val spritesheetLoader = SpritesheetLoader()
@@ -81,7 +81,7 @@ class MapLoader {
                     }
                     restitution = 0.1f
                     density = 1f
-                    friction = 0.1f
+                    friction = 0f
                 })
                 .add(PlayerControlled())
                 .add(SpriteOffset(Vector2(-.75f, -1.1f)))
@@ -126,6 +126,9 @@ class MapLoader {
      */
     fun loadMap(world: World, path: String, unload: UnloadType = UnloadType.ALL,
                 customTriggerProcessor: TriggerProcessor = defaultTriggerProcessor): EntityInt {
+
+        Throwable().printStackTrace()
+
         if (unload == UnloadType.ALL || unload == UnloadType.NonMinigame) {
             // Unload previously loaded maps
             val entities = world.aspectSubscriptionManager[Aspect.all()].entities

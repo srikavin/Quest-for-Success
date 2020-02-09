@@ -22,7 +22,6 @@ class SpritesheetLoader {
         return loadAsespriteSheet(Texture(Gdx.files.internal(imgPath)), jsonReader.parse(Gdx.files.internal(propertiesPath)))
     }
 
-
     fun loadAsespriteSheet(img: Texture, properties: JsonValue): GdxMap<String, Animation<TextureRegion>> {
         val ret = GdxMap<String, Animation<TextureRegion>>()
 

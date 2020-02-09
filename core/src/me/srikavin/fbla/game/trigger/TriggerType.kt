@@ -8,5 +8,6 @@ enum class TriggerType {
     TRANSITION,
     INTERACTIVE,
     MINIGAME,
-    DAMAGE
+    DAMAGE,
+    TUTORIAL
 }

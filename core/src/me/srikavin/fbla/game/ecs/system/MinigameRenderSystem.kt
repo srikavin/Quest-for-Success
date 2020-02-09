@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport
 import ktx.log.info
 import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.ecs.component.MinigameComponent
+import me.srikavin.fbla.game.registerInputHandler
 
 /**
  * Handles rendering active minigames
@@ -24,23 +25,28 @@ import me.srikavin.fbla.game.ecs.component.MinigameComponent
 class MinigameRenderSystem : IteratingSystem() {
     @Wire
     private lateinit var minigameMapper: ComponentMapper<MinigameComponent>
+
     @Wire
     private lateinit var camera: OrthographicCamera
+
     @Wire
     private lateinit var batch: SpriteBatch
-    @Wire
-    private lateinit var stage: Stage
+
     @Wire
     private lateinit var skin: Skin
+    private lateinit var minigameStage: Stage
 
     override fun initialize() {
         super.initialize()
-        stage = Stage(ExtendViewport(640f, 480f))
+        minigameStage = Stage(ExtendViewport(640f, 480f))
+        registerInputHandler(minigameStage)
         subscription.addSubscriptionListener(object : EntitySubscription.SubscriptionListener {
             override fun inserted(entities: IntBag) {
                 for (i in 0 until entities.size()) {
                     val e: EntityInt = entities[i]
-                    minigameMapper[e].minigame?.initialize(skin, stage)
+                    minigameStage.clear()
+
+                    minigameMapper[e].minigame?.initialize(skin, minigameStage)
                             ?: info { "Minigame not initialized upon creation: ${minigameMapper[e]}" }
                 }
             }
@@ -64,12 +70,12 @@ class MinigameRenderSystem : IteratingSystem() {
             camera.update()
             batch.projectionMatrix = camera.combined
 
-            minigame.render(camera, batch, stage)
+            minigame.render(camera, batch, minigameStage)
 
-            stage.act(Gdx.graphics.deltaTime)
-            stage.draw()
+            minigameStage.act(Gdx.graphics.deltaTime)
+            minigameStage.draw()
         } else {
-            stage.clear()
+            minigameStage.clear()
         }
     }
 

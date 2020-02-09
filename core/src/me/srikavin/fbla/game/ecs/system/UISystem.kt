@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.rafaskoberg.gdx.typinglabel.TypingConfig
 import me.srikavin.fbla.game.GameState
+import me.srikavin.fbla.game.registerInputHandler
 
 /**
  * Responsible for drawing and updating UI elements
@@ -31,7 +32,7 @@ class UISystem : BaseSystem() {
         super.initialize()
         TypingConfig.DEFAULT_SPEED_PER_CHAR = 0.05f
 
-        Gdx.input.inputProcessor = stage
+        registerInputHandler(stage)
 
         scoreCell = root.add("")
         root.row()

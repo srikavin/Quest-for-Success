@@ -44,6 +44,15 @@ abstract class DialogueCallable {
     }
 
     /**
+     * This function delays future calls to allow for speech-style dialogues.
+     */
+    fun delay() {
+        runBlocking {
+            delay(750)
+        }
+    }
+
+    /**
      * Sends a request to receive a response from the user based on the given list of choices. This call blocks until
      * the user has chosen a response.
      *

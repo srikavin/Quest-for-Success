@@ -34,8 +34,8 @@ class PhysicsBody() : Component() {
     var type: BodyDef.BodyType = BodyDef.BodyType.DynamicBody
     var shape: Shape = CircleShape().apply { radius = .5f }
     var density: Float = 1f
-    var friction: Float = 0.3f
-    var linearDamping: Float = .7f
+    var friction: Float = 0.9f
+    var linearDamping: Float = 0f
 
     var isSensor: Boolean = false
 

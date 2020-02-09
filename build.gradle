@@ -78,6 +78,8 @@ project(":core") {
         compile "io.github.libktx:ktx-scene2d:$ktxVersion"
         compile "io.github.libktx:ktx-style:$ktxVersion"
 
+        compile "com.strongjoshua:libgdx-inGameConsole:1.0.0"
+
         compile "net.onedaybeard.artemis:artemis-odb:2.2.0"
 
         api "com.rafaskoberg.gdx:typing-label:1.1.0"

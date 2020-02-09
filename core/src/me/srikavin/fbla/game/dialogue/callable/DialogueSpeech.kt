@@ -14,6 +14,8 @@ class DialogueSpeech : DialogueCallable() {
             updateScore(-1)
         }
 
+        delay()
+
         index = getResponse(listOf("Hopefully, my passion for this organization will pass onto the newer members as well.", "Although I don't really like the club, it's good for colleges."))
 
         if (index == 0) {
@@ -22,6 +24,9 @@ class DialogueSpeech : DialogueCallable() {
         if (index == 1) {
             updateScore(-1)
         }
+
+        delay()
+
         index = getResponse(listOf("So for more opportunities and a better experience in the club, vote for me!", "So like, make sure I win."))
 
         if (index == 0) {
@@ -30,6 +35,8 @@ class DialogueSpeech : DialogueCallable() {
         if (index == 1) {
             updateScore(-1)
         }
+
+        delay()
 
         val score = getScore()
         if (score > 0) {

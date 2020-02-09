@@ -5,7 +5,7 @@ import com.badlogic.gdx.Input
 /**
  * List of all possible actions to do within the game
  */
-enum class Actions {
+enum class GameActions {
     MOVE_LEFT,
     MOVE_RIGHT,
     JUMP,
@@ -16,14 +16,14 @@ enum class Actions {
 /**
  * A list of bindings between actions and Gdx [Input] keys
  */
-class KeyBindings(val bindings: Map<Actions, Int>) {
+class KeyBindings(val bindings: Map<GameActions, Int>) {
     constructor() : this(
-            mapOf<Actions, Int>(
-                    Pair(Actions.MOVE_LEFT, Input.Keys.LEFT),
-                    Pair(Actions.MOVE_RIGHT, Input.Keys.RIGHT),
-                    Pair(Actions.JUMP, Input.Keys.UP),
-                    Pair(Actions.USE, Input.Keys.E),
-                    Pair(Actions.QUIT, Input.Keys.ESCAPE)
+            mapOf<GameActions, Int>(
+                    Pair(GameActions.MOVE_LEFT, Input.Keys.LEFT),
+                    Pair(GameActions.MOVE_RIGHT, Input.Keys.RIGHT),
+                    Pair(GameActions.JUMP, Input.Keys.UP),
+                    Pair(GameActions.USE, Input.Keys.E),
+                    Pair(GameActions.QUIT, Input.Keys.ESCAPE)
             )
     )
 }

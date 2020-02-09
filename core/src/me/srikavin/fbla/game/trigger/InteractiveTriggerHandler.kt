@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.ui.Label
@@ -19,6 +21,8 @@ import me.srikavin.fbla.game.ecs.component.Transform
 
 class InteractiveTriggerHandler : TriggerHandler {
     private val font: BitmapFont
+    private val tempMatrix: Matrix4 = Matrix4()
+    private val tempVector2: Vector2 = Vector2()
 
     init {
         val generator = FreeTypeFontGenerator(Gdx.files.internal("assets/fonts/Kenney Future.ttf"))
@@ -33,7 +37,7 @@ class InteractiveTriggerHandler : TriggerHandler {
     }
 
     lateinit var skin: Skin
-    val dialog by lazy {
+    private val dialog by lazy {
         object : Dialog("Hint", skin) {
             override fun result(obj: Any?) {
                 this.remove()
@@ -42,7 +46,6 @@ class InteractiveTriggerHandler : TriggerHandler {
             titleLabel.setFillParent(true)
             button("Close")
         }
-
     }
 
 
@@ -53,10 +56,10 @@ class InteractiveTriggerHandler : TriggerHandler {
 
         val batch = world.getRegistered(SpriteBatch::class.java)
 
-        batch.projectionMatrix = camera.combined.cpy().scale(1 / 75f, 1 / 75f, 1f)
+        batch.projectionMatrix = tempMatrix.set(camera.combined).scale(1 / 75f, 1 / 75f, 1f)
 
         if (positionMapper.has(triggerEntity)) {
-            val pos = positionMapper[triggerEntity].position.cpy().sub(3f, -1f).scl(75f, 75f)
+            val pos = tempVector2.set(positionMapper[triggerEntity].position).sub(3f, -1f).scl(75f, 75f)
 
             if (batch.isDrawing) {
                 font.draw(batch, "Interact [E]", pos.x, pos.y)

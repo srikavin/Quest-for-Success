@@ -5,16 +5,14 @@ import com.artemis.WorldConfigurationBuilder
 import com.artemis.managers.TagManager
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.assets.loaders.SkinLoader
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
@@ -22,18 +20,19 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.*
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.ObjectMap
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import com.badlogic.gdx.utils.viewport.FitViewport
-import ktx.actors.onClick
+import com.strongjoshua.console.CommandExecutor
+import com.strongjoshua.console.GUIConsole
 import ktx.assets.disposeSafely
 import me.srikavin.fbla.game.Scene.PLAYING
 import me.srikavin.fbla.game.Scene.TITLE
 import me.srikavin.fbla.game.ecs.system.*
 import me.srikavin.fbla.game.map.MapLoader
 import me.srikavin.fbla.game.physics.ContactListenerManager
+import me.srikavin.fbla.game.ui.MainMenu
 
 const val cameraScale = 45f
 
@@ -44,12 +43,15 @@ enum class Scene {
 }
 
 class FBLAGame : ApplicationAdapter() {
-    lateinit var camera: OrthographicCamera
-    lateinit var world: World
-    lateinit var batch: SpriteBatch
-    lateinit var skin: Skin
-    var assetManager = AssetManager()
-    lateinit var splashImage: Texture
+    private lateinit var camera: OrthographicCamera
+    private lateinit var world: World
+    private lateinit var batch: SpriteBatch
+    private lateinit var skin: Skin
+    private var assetManager = AssetManager()
+    private lateinit var splashImage: Texture
+    private lateinit var console: GUIConsole
+
+    private lateinit var mainMenuUI: MainMenu
 
     private var scene: Scene = Scene.LOADING
 
@@ -61,7 +63,7 @@ class FBLAGame : ApplicationAdapter() {
             camera.zoom = 1f
             camera.update()
         } else if (scene == TITLE) {
-            stageBg.viewport.update(width, height)
+            mainMenuUI.build()
         }
     }
 
@@ -70,7 +72,7 @@ class FBLAGame : ApplicationAdapter() {
         camera.position.x = 0f
         camera.position.y = cameraScale * (9f / 16f) * 0.75f
 
-        val physicsWorld = com.badlogic.gdx.physics.box2d.World(Vector2(0f, -23f), true)
+        val physicsWorld = com.badlogic.gdx.physics.box2d.World(Vector2(0f, -20f), true)
 
         val stage = Stage(ExtendViewport(640f, 480f))
         val root = Table(skin)
@@ -98,7 +100,7 @@ class FBLAGame : ApplicationAdapter() {
                         DialogueSystem(),
                         TriggerSystem(listenerManager),
                         UISystem(),
-                        PhysicsDebugSystem(physicsWorld, debug = false)
+                        PhysicsDebugSystem(physicsWorld, debug = true)
                 )
                 .with(TagManager())
                 .build()
@@ -114,12 +116,26 @@ class FBLAGame : ApplicationAdapter() {
 
         world = World(config)
         mapLoader.loadMap(world, "assets/maps/level1.tmx")
+
+        console = GUIConsole()
+
+        @Suppress("unused")
+        console.setCommandExecutor(object : CommandExecutor() {
+            fun loadLevel(name: String) {
+                mapLoader.loadMap(world, "assets/maps/${name}.tmx")
+            }
+
+            fun debug(boolean: Boolean) {
+                world.getSystem(PhysicsDebugSystem::class.java).debug = boolean
+            }
+        })
+        console.displayKeyID = Input.Keys.ALT_RIGHT
+
     }
 
-    private lateinit var titleBg: TextureRegion
-    private lateinit var stageBg: Stage
-
     override fun create() {
+        Colors.put("accent", Color.valueOf("#AA3E39"))
+
         batch = SpriteBatch()
         splashImage = Texture(Gdx.files.internal("assets/graphics/titlelogo.png"))
 
@@ -129,92 +145,40 @@ class FBLAGame : ApplicationAdapter() {
         assetManager.setLoader(FreeTypeFontGenerator::class.java, FreeTypeFontGeneratorLoader(resolver))
         assetManager.setLoader(BitmapFont::class.java, ".ttf", FreetypeFontLoader(resolver))
 
-        val parameter = FreetypeFontLoader.FreeTypeFontLoaderParameter()
-        parameter.fontParameters.size = 48
-        parameter.fontFileName = "assets/fonts/Kenney Pixel.ttf"
-        assetManager.load("KenneyPixel48.ttf", BitmapFont::class.java, parameter)
-        val font = assetManager.finishLoadingAsset<BitmapFont>("KenneyPixel48.ttf")
+
+        fun newCursor(name: String): Cursor {
+            val p = Pixmap(Gdx.files.internal("assets/cursors/$name.png"))
+            return Gdx.graphics.newCursor(p, 32, 32)
+        }
+
+        Gdx.graphics.setCursor(newCursor("cursor"))
+
+        val parameter = FreetypeFontLoader.FreeTypeFontLoaderParameter().apply {
+            fontParameters.apply {
+                size = 22
+                fontFileName = "assets/fonts/font.ttf"
+                gamma = .8f
+            }
+        }
+        assetManager.load("defaultFont.ttf", BitmapFont::class.java, parameter)
+        val font = assetManager.finishLoadingAsset<BitmapFont>("defaultFont.ttf")
+        font.data.apply {
+            markupEnabled = true
+        }
 
         val fontMap = ObjectMap<String, Any>()
-        fontMap.put("KenneyPixel", font)
+        fontMap.put("defaultFont", font)
 
         assetManager.load("assets/skin/skin.json", Skin::class.java, SkinLoader.SkinParameter(fontMap))
     }
 
     fun afterLoad() {
-        skin = assetManager.get<Skin>("assets/skin/skin.json")
-        skin.add("KenneyPixel", assetManager.get("KenneyPixel48.ttf"))
-    }
-
-    fun initTitleScreen() {
-        camera = OrthographicCamera(cameraScale, cameraScale * (9f / 16f))
-        titleBg = TextureRegion(Texture(Gdx.files.internal("assets/graphics/homescreen.png")))
-
-        stageBg = Stage(FitViewport(640f, 640f))
-        val table = Table(skin)
-        table.setFillParent(true)
-
-        table.background(TextureRegionDrawable(titleBg))
-        stageBg.addActor(table)
-
-        table.bottom()
-
-        val vertGroup = VerticalGroup()
-        vertGroup.padBottom(150f)
-        table.add(vertGroup)
-
-        vertGroup.space(3f)
-
-        val play = Button(skin, "green").apply {
-            add("Play")
-            pad(10f)
-        }
-
-        val instructions = Button(skin).apply {
-            add("Instructions").actor.setFontScale(0.75f)
-            pad(5f)
-        }
-
-        val exit = Button(skin, "red").apply {
-            add("Quit").actor.setFontScale(0.7f)
-            pad(10f)
-        }
-
-        play.onClick {
+        skin = assetManager.get("assets/skin/skin.json")
+        mainMenuUI = MainMenu(skin) {
             startGame()
+            mainMenuUI.disposeSafely()
             scene = PLAYING
         }
-
-        instructions.onClick {
-            val dialog = object : Dialog("Instructions", skin) {
-                override fun result(obj: Any?) {
-                    this.remove()
-                }
-            }
-            dialog.titleLabel.setFillParent(true)
-            dialog.text(Label("\n" +
-                    "Use the arrow keys to move.\n" +
-                    "Use the mouse or displayed numerical key\nto choose options on screen.\n" +
-                    "Use the escape key to quit.\n" +
-                    "Collect coins to increase your score!",
-                    skin, "black").apply {
-                setFontScale(.75f)
-            })
-
-            dialog.button("Close")
-            dialog.show(stageBg)
-        }
-
-
-        exit.onClick {
-            Gdx.app.exit()
-        }
-
-        vertGroup.addActor(play)
-        vertGroup.addActor(instructions)
-        vertGroup.addActor(exit)
-        Gdx.input.inputProcessor = stageBg
-        scene = TITLE
     }
 
     override fun render() {
@@ -222,13 +186,13 @@ class FBLAGame : ApplicationAdapter() {
             PLAYING -> {
                 world.setDelta(Gdx.graphics.deltaTime)
                 world.process()
+                console.draw()
             }
             TITLE -> {
-                Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
+                Gdx.gl.glClearColor(20f, 20f, 20f, 1f)
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
-                stageBg.act()
-                stageBg.draw()
+                mainMenuUI.render()
             }
             Scene.LOADING -> {
                 // Render splash image
@@ -241,7 +205,8 @@ class FBLAGame : ApplicationAdapter() {
                 // Continue loading resources
                 if (assetManager.update()) {
                     afterLoad()
-                    initTitleScreen()
+                    mainMenuUI.build()
+                    scene = TITLE
                 }
             }
         }
