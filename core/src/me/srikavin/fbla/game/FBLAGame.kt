@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGeneratorLoader
 import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader
+import com.badlogic.gdx.maps.MapProperties
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.Vector2
@@ -29,8 +30,10 @@ import com.strongjoshua.console.GUIConsole
 import ktx.assets.disposeSafely
 import me.srikavin.fbla.game.Scene.PLAYING
 import me.srikavin.fbla.game.Scene.TITLE
+import me.srikavin.fbla.game.ecs.component.MinigameComponent
 import me.srikavin.fbla.game.ecs.system.*
 import me.srikavin.fbla.game.map.MapLoader
+import me.srikavin.fbla.game.minigame.dropcatch.DropcatchMinigame
 import me.srikavin.fbla.game.physics.ContactListenerManager
 import me.srikavin.fbla.game.ui.MainMenu
 
@@ -74,7 +77,7 @@ class FBLAGame : ApplicationAdapter() {
 
         val physicsWorld = com.badlogic.gdx.physics.box2d.World(Vector2(0f, -20f), true)
 
-        val stage = Stage(ExtendViewport(640f, 480f))
+        val stage = Stage(ExtendViewport(1920f, 1080f))
         val root = Table(skin)
         stage.addActor(root)
 
@@ -125,6 +128,19 @@ class FBLAGame : ApplicationAdapter() {
                 mapLoader.loadMap(world, "assets/maps/${name}.tmx")
             }
 
+            fun mainMenu() {
+                afterLoad()
+            }
+
+            fun dropcatch(stage: String) {
+                world.createEntity().edit().add(MinigameComponent().apply {
+                    minigame = DropcatchMinigame().apply {
+                        reset(MapProperties().apply { put("subtype", stage); put("next_level", "level1.tmx") }, world, mapLoader)
+                    }
+                })
+
+            }
+
             fun debug(boolean: Boolean) {
                 world.getSystem(PhysicsDebugSystem::class.java).debug = boolean
             }
@@ -135,6 +151,7 @@ class FBLAGame : ApplicationAdapter() {
 
     override fun create() {
         Colors.put("accent", Color.valueOf("#AA3E39"))
+        Colors.put("green", Color.valueOf("#00FF00"))
 
         batch = SpriteBatch()
         splashImage = Texture(Gdx.files.internal("assets/graphics/titlelogo.png"))
@@ -179,6 +196,8 @@ class FBLAGame : ApplicationAdapter() {
             mainMenuUI.disposeSafely()
             scene = PLAYING
         }
+        mainMenuUI.build()
+        scene = TITLE
     }
 
     override fun render() {
@@ -189,7 +208,7 @@ class FBLAGame : ApplicationAdapter() {
                 console.draw()
             }
             TITLE -> {
-                Gdx.gl.glClearColor(20f, 20f, 20f, 1f)
+                Gdx.gl.glClearColor(0f, 0f, 0f, 1f)
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
 
                 mainMenuUI.render()
@@ -205,8 +224,6 @@ class FBLAGame : ApplicationAdapter() {
                 // Continue loading resources
                 if (assetManager.update()) {
                     afterLoad()
-                    mainMenuUI.build()
-                    scene = TITLE
                 }
             }
         }
