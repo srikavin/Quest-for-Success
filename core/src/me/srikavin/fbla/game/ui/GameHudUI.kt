@@ -21,7 +21,6 @@ class GameHudUI(private val skin: Skin, private val gameState: GameState) : Game
 
     init {
         registerInputHandler(stage)
-        stage.isDebugAll = true
     }
 
     fun build() {

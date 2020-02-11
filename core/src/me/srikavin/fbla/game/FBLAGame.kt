@@ -106,7 +106,7 @@ class FBLAGame : ApplicationAdapter() {
                         DialogueSystem(),
                         TriggerSystem(listenerManager),
                         UISystem(),
-                        PhysicsDebugSystem(physicsWorld, debug = true)
+                        PhysicsDebugSystem(physicsWorld, debug = false)
                 )
                 .with(TagManager())
                 .build()
@@ -198,8 +198,6 @@ class FBLAGame : ApplicationAdapter() {
         }
         mainMenuUI.build()
         scene = TITLE
-        startGame()
-        scene = PLAYING
     }
 
     override fun render() {
