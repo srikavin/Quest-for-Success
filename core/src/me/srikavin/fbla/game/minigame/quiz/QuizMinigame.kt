@@ -8,8 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.rafaskoberg.gdx.typinglabel.TypingLabel
-import me.srikavin.fbla.game.GdxArray
 import me.srikavin.fbla.game.minigame.Minigame
+import me.srikavin.fbla.game.util.GdxArray
 
 class QuizMinigame : Minigame() {
     private val inputs = GdxArray<Int>()

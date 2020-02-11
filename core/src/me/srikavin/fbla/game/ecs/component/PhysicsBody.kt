@@ -2,7 +2,7 @@ package me.srikavin.fbla.game.ecs.component
 
 import com.artemis.Component
 import com.badlogic.gdx.physics.box2d.*
-import me.srikavin.fbla.game.GdxArray
+import me.srikavin.fbla.game.util.GdxArray
 
 /**
  * A component containing the necessary properties to represent an entity as a physics object

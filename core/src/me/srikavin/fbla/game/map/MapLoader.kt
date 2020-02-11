@@ -18,14 +18,14 @@ import com.badlogic.gdx.physics.box2d.*
 import ktx.assets.disposeSafely
 import ktx.log.error
 import ktx.log.info
-import me.srikavin.fbla.game.EntityInt
-import me.srikavin.fbla.game.GdxArray
 import me.srikavin.fbla.game.ecs.component.*
 import me.srikavin.fbla.game.ecs.component.Transform
 import me.srikavin.fbla.game.ecs.system.CameraFollowSystem
 import me.srikavin.fbla.game.graphics.MAP_SCALE_FACTOR
 import me.srikavin.fbla.game.graphics.SpritesheetLoader
 import me.srikavin.fbla.game.trigger.TriggerType
+import me.srikavin.fbla.game.util.EntityInt
+import me.srikavin.fbla.game.util.GdxArray
 
 
 private const val COLLISION_LAYER_NAME = "Collision"
@@ -84,7 +84,7 @@ class MapLoader {
                     friction = 0f
                 })
                 .add(PlayerControlled())
-                .add(SpriteOffset(Vector2(-.75f, -1.1f)))
+                .add(SpriteOffset(Vector2(-0.85f, -1.1f)))
                 .add(Transform().apply { position = pos })
                 .add(SwitchableAnimation().apply { animations = playerAnimations; currentState = "Stand" })
                 .add(FixedRotation())
@@ -97,7 +97,7 @@ class MapLoader {
     /**
      * Creates a coin entity with the given world and given position
      */
-    private fun createCoin(world: World, pos: Vector2) {
+    fun createCoin(world: World, pos: Vector2) {
         world.createEntity().edit()
                 .add(Transform().apply { position = pos })
                 .add(Sprite().apply { sprite = coinSprite })

@@ -6,11 +6,11 @@ import com.badlogic.gdx.maps.MapProperties
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import kotlinx.coroutines.channels.Channel
-import me.srikavin.fbla.game.GameState
 import me.srikavin.fbla.game.dialogue.DialogueCallable
 import me.srikavin.fbla.game.dialogue.DialogueManager
 import me.srikavin.fbla.game.ecs.component.DialogueComponent
 import me.srikavin.fbla.game.minigame.Minigame
+import me.srikavin.fbla.game.state.GameState
 
 class DialogueMinigame : Minigame() {
     lateinit var dialogueManager: DialogueManager

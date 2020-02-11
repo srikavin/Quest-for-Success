@@ -1,54 +1,60 @@
 package me.srikavin.fbla.game.ecs.system
 
 import com.artemis.BaseSystem
+import com.artemis.ComponentMapper
 import com.artemis.annotations.Wire
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Cell
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.artemis.managers.TagManager
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.rafaskoberg.gdx.typinglabel.TypingConfig
-import me.srikavin.fbla.game.GameState
-import me.srikavin.fbla.game.registerInputHandler
+import me.srikavin.fbla.game.ecs.component.Dead
+import me.srikavin.fbla.game.state.GameState
+import me.srikavin.fbla.game.ui.DeadUI
+import me.srikavin.fbla.game.ui.GameHudUI
 
 /**
  * Responsible for drawing and updating UI elements
  */
 class UISystem : BaseSystem() {
-    @Wire
-    private lateinit var stage: Stage
-    @Wire
-    private lateinit var root: Table
-    @Wire
-    private lateinit var gameState: GameState
+    private lateinit var gameHudUI: GameHudUI
+    private lateinit var deadUI: DeadUI
 
-    private lateinit var scoreCell: Cell<Label>
-    private lateinit var livesCell: Cell<Label>
+    var showingDead = false
 
-    private var builder = StringBuilder("Score: ")
-    private var builderLives = StringBuilder("Lives: ")
+    @Wire
+    private lateinit var deadMapper: ComponentMapper<Dead>
 
     override fun initialize() {
         super.initialize()
         TypingConfig.DEFAULT_SPEED_PER_CHAR = 0.05f
 
-        registerInputHandler(stage)
+        gameHudUI = GameHudUI(world.getRegistered(Skin::class.java), world.getRegistered(GameState::class.java))
+        deadUI = DeadUI(world.getRegistered(Skin::class.java))
 
-        scoreCell = root.add("")
-        root.row()
-        livesCell = root.add("")
+        gameHudUI.build()
     }
 
     override fun processSystem() {
-        scoreCell.actor.setText("Score: ${gameState.score}")
-        livesCell.actor.setText("Lives: ${gameState.lives}")
+        gameHudUI.render()
 
-        stage.act(Gdx.graphics.deltaTime)
-        stage.draw()
+        val player = world.getSystem(TagManager::class.java).getEntityId("PLAYER")
+
+        showingDead = if (deadMapper.has(player)) {
+            if (!showingDead) {
+                deadUI.build(deadMapper[player])
+            }
+            true
+        } else {
+            false
+        }
+
+        if (showingDead) {
+            deadUI.render()
+        }
     }
 
     override fun dispose() {
         super.dispose()
-        stage.dispose()
+        gameHudUI.dispose()
+        deadUI.dispose()
     }
 }

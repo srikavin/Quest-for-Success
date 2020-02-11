@@ -12,10 +12,7 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse
 import com.badlogic.gdx.physics.box2d.ContactListener
 import com.badlogic.gdx.physics.box2d.Manifold
 import me.srikavin.fbla.game.GameActions
-import me.srikavin.fbla.game.ecs.component.DisableInput
-import me.srikavin.fbla.game.ecs.component.PhysicsBody
-import me.srikavin.fbla.game.ecs.component.PlayerControlled
-import me.srikavin.fbla.game.ecs.component.Transform
+import me.srikavin.fbla.game.ecs.component.*
 import me.srikavin.fbla.game.graphics.player_foot_fixture_id
 import me.srikavin.fbla.game.physics.ContactListenerManager
 
@@ -36,6 +33,9 @@ class InputSystem(private val listenerManager: ContactListenerManager) : Iterati
 
     @Wire
     private lateinit var physicsBodyMapper: ComponentMapper<PhysicsBody>
+
+    @Wire
+    private lateinit var deadMapper: ComponentMapper<Dead>
 
     private var allowJump: Int = 0
 
@@ -71,6 +71,10 @@ class InputSystem(private val listenerManager: ContactListenerManager) : Iterati
 
 
     override fun process(entityId: Int) {
+        if (deadMapper.has(entityId)) {
+            return
+        }
+
         val body = physicsBodyMapper[entityId].body
 
         if (allowJump == 0 && body.linearVelocity.y < -1f && body.linearVelocity.y > -15f) {

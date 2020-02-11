@@ -11,24 +11,24 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Align
-import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Scaling
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import ktx.actors.alpha
-import me.srikavin.fbla.game.GdxArray
 import me.srikavin.fbla.game.ext.addImageTextButton
 import me.srikavin.fbla.game.ext.sequence
 import me.srikavin.fbla.game.ext.table
-import me.srikavin.fbla.game.registerInputHandler
-import me.srikavin.fbla.game.unregisterInputHandler
+import me.srikavin.fbla.game.util.GdxArray
+import me.srikavin.fbla.game.util.registerInputHandler
+import me.srikavin.fbla.game.util.unregisterInputHandler
 
-class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : Disposable {
+private const val style_name = "menu"
+
+class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : GameUI() {
     private val stage = Stage(ExtendViewport(1920f, 1080f, 1920f, 1080f))
     private val container = Table(skin)
     private val cloudContainer = Table(skin)
     private val bgStack = Stack()
     private val filterStack = Stack()
-
 
     private lateinit var submenu: Table
     private lateinit var infoPanel: Table
@@ -47,7 +47,6 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
     init {
         logo = TextureRegionDrawable(Texture(Gdx.files.internal("assets/graphics/titlelogopic.png")))
         fblaLogo = TextureRegionDrawable(Texture(Gdx.files.internal("assets/graphics/fbla-logo.png")))
-
 
         cloud = TextureRegionDrawable(Texture(Gdx.files.internal("assets/graphics/backgrounds/cloud1.png")))
         cloud2 = TextureRegionDrawable(Texture(Gdx.files.internal("assets/graphics/backgrounds/cloud2.png")))
@@ -102,7 +101,6 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
         animateCloud(cloud3, 45f, 700f, -120f)
         animateCloud(cloud, 35f, 500f, 0f)
 
-
         container.left()
         container.add().width(Gdx.graphics.width / 15f)
 
@@ -119,22 +117,31 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
                     ),
                     Buttoni("Instructions", null, Runnable {
                         infoPanel.clearChildren()
-                        infoPanel.add(Label("[accent]Instructions[]", skin).apply { setFontScale(2f) })
+                        infoPanel.add(Label("[accent]Instructions[]", skin, "default"))
                         infoPanel.row()
                         infoPanel.add("Use the arrow keys to move.\n" +
                                 "Use the mouse or displayed numerical key\nto choose options on screen.\n" +
                                 "Use the escape key to quit.\n" +
-                                "Collect coins to increase your score!")
+                                "Collect coins to increase your score!", style_name)
                     }),
-                    Buttoni("About", null, Runnable {
-                        infoPanel.clearChildren()
-                        infoPanel.add("The [accent]Quest[] for [#00ff00]Success[]\n\n" +
-                                "Programming by [accent]Srikavin Ramkumar[]\n" +
-                                "Story by [#00ff00]David Rogers[]\n" +
-                                "Art by [#DA680F]Nicholas Quach[]"
-//                                "Made for the [#32527B]FBLA[] Computer Game &\n Simulation Programming Competition"
-                        )
-                    }),
+                    Buttoni("About", null,
+                            Buttoni("Credits", null, Runnable {
+                                infoPanel.clearChildren()
+                                infoPanel.add("The [accent]Quest[] for [#00ff00]Success[]\n\n" +
+                                        "Programming by [accent]Srikavin Ramkumar[]\n" +
+                                        "Story by [#00ff00]David Rogers[]\n" +
+                                        "Art by [#DA680F]Nicholas Quach[]\n\n" +
+                                        "Made for the [#32527B]FBLA[] Computer Game &\nSimulation Programming Competition",
+                                        style_name)
+                            }),
+                            Buttoni("License", null, Runnable {
+                                infoPanel.clearChildren()
+                                infoPanel.add("This game is licensed under the\n" +
+                                        "[accent]Apache 2.0 License[].\n" +
+                                        "A copy can be found in [#32527B]LICENSE.txt[]",
+                                        style_name)
+                            })
+                    ),
                     Buttoni("Exit", null, Runnable { Gdx.app.exit() })
 
             )
@@ -151,7 +158,7 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
 
         val infoContainer = container
                 .table {
-                    it.top().add(Image(logo)).height(300f).width(300 * 166 / 133f)
+                    it.top().add(Image(logo)).height(400f).width(400 * 166 / 133f)
                 }.height(550f)
                 .width(800f)
                 .pad(20f)
@@ -163,7 +170,7 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
         infoContainer.table {
             infoPanel = it.table(NinePatchDrawable(skin.getPatch("menu-button-bg")))
                     .width(550f)
-                    .padTop(((Gdx.graphics.height - 170f) / 2) - 250f)
+                    .padTop(((Gdx.graphics.height - 170f) / 2) - 350f)
                     .growY().actor
         }.height(350f)
 
@@ -244,7 +251,7 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
                         b.runnable?.run()
                     }
                 }
-            }, "menu").actor
+            }, style_name).actor
             t.row()
 
             out[0]!!.padLeft(11f)
@@ -273,7 +280,7 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
         }
     }
 
-    fun render() {
+    override fun render() {
         curButtons.forEach {
             it.isChecked = currentMenu == it
         }
@@ -282,7 +289,6 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : D
 
         stage.act()
         stage.draw()
-
     }
 
     override fun dispose() {

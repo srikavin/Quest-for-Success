@@ -30,12 +30,15 @@ import com.strongjoshua.console.GUIConsole
 import ktx.assets.disposeSafely
 import me.srikavin.fbla.game.Scene.PLAYING
 import me.srikavin.fbla.game.Scene.TITLE
+import me.srikavin.fbla.game.award.Awards
 import me.srikavin.fbla.game.ecs.component.MinigameComponent
 import me.srikavin.fbla.game.ecs.system.*
 import me.srikavin.fbla.game.map.MapLoader
 import me.srikavin.fbla.game.minigame.dropcatch.DropcatchMinigame
 import me.srikavin.fbla.game.physics.ContactListenerManager
+import me.srikavin.fbla.game.state.GameState
 import me.srikavin.fbla.game.ui.MainMenu
+import me.srikavin.fbla.game.util.GameFonts
 
 const val cameraScale = 45f
 
@@ -138,7 +141,14 @@ class FBLAGame : ApplicationAdapter() {
                         reset(MapProperties().apply { put("subtype", stage); put("next_level", "level1.tmx") }, world, mapLoader)
                     }
                 })
+            }
 
+            fun addAward(name: String) {
+                gameState.addAward(name)
+            }
+
+            fun removeAward(name: String) {
+                gameState.removeAward(name)
             }
 
             fun debug(boolean: Boolean) {
@@ -162,6 +172,8 @@ class FBLAGame : ApplicationAdapter() {
         assetManager.setLoader(FreeTypeFontGenerator::class.java, FreeTypeFontGeneratorLoader(resolver))
         assetManager.setLoader(BitmapFont::class.java, ".ttf", FreetypeFontLoader(resolver))
 
+        GameFonts.loadFonts(assetManager, "assets/fonts/font.ttf")
+        Awards.init(assetManager)
 
         fun newCursor(name: String): Cursor {
             val p = Pixmap(Gdx.files.internal("assets/cursors/$name.png"))
@@ -170,21 +182,9 @@ class FBLAGame : ApplicationAdapter() {
 
         Gdx.graphics.setCursor(newCursor("cursor"))
 
-        val parameter = FreetypeFontLoader.FreeTypeFontLoaderParameter().apply {
-            fontParameters.apply {
-                size = 22
-                fontFileName = "assets/fonts/font.ttf"
-                gamma = .8f
-            }
-        }
-        assetManager.load("defaultFont.ttf", BitmapFont::class.java, parameter)
-        val font = assetManager.finishLoadingAsset<BitmapFont>("defaultFont.ttf")
-        font.data.apply {
-            markupEnabled = true
-        }
-
         val fontMap = ObjectMap<String, Any>()
-        fontMap.put("defaultFont", font)
+        fontMap.put("defaultFont", GameFonts.DEFAULT)
+        fontMap.put("menuFont", GameFonts.MENU)
 
         assetManager.load("assets/skin/skin.json", Skin::class.java, SkinLoader.SkinParameter(fontMap))
     }
@@ -198,6 +198,8 @@ class FBLAGame : ApplicationAdapter() {
         }
         mainMenuUI.build()
         scene = TITLE
+        startGame()
+        scene = PLAYING
     }
 
     override fun render() {

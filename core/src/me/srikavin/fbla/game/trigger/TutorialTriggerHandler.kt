@@ -1,8 +1,8 @@
 package me.srikavin.fbla.game.trigger
 
 import com.artemis.World
-import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.ecs.component.MapTrigger
+import me.srikavin.fbla.game.util.EntityInt
 
 enum class TutorialType {
     START,

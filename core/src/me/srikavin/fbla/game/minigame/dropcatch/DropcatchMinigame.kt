@@ -23,9 +23,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.ObjectMap
 import ktx.log.info
-import me.srikavin.fbla.game.EntityInt
-import me.srikavin.fbla.game.GameState
-import me.srikavin.fbla.game.GdxArray
 import me.srikavin.fbla.game.ecs.component.PhysicsBody
 import me.srikavin.fbla.game.ecs.component.Sprite
 import me.srikavin.fbla.game.ecs.component.SpriteOffset
@@ -36,6 +33,11 @@ import me.srikavin.fbla.game.graphics.MAP_SCALE_FACTOR
 import me.srikavin.fbla.game.map.MapLoader
 import me.srikavin.fbla.game.minigame.Minigame
 import me.srikavin.fbla.game.physics.ContactListenerManager
+import me.srikavin.fbla.game.state.GameState
+import me.srikavin.fbla.game.util.EntityInt
+import me.srikavin.fbla.game.util.GdxArray
+
+const val style_name = "menu"
 
 class DropcatchMinigame : Minigame() {
     private val inputs = GdxArray<Int>()
@@ -91,10 +93,8 @@ class DropcatchMinigame : Minigame() {
 
         container.addActor(table)
 
-        itemsLeft = Label("Items Left: ?", skin)
-        timeLeft = Label("Time Left: ?", skin)
-
-
+        itemsLeft = Label("Items Left: ?", skin, style_name)
+        timeLeft = Label("Time Left: ?", skin, style_name)
 
         table.add(itemsLeft)
         table.row()
@@ -134,8 +134,10 @@ class DropcatchMinigame : Minigame() {
                     if (comp.type == DropcatchItemType.GOOD) {
                         gameState.score += 1
                         goodItemsLeft -= 1
+                        goodCollected++
                     } else {
                         gameState.score -= 1
+                        badCollected++
                     }
                     Gdx.app.postRunnable {
                         world.delete(otherId)
@@ -186,67 +188,68 @@ class DropcatchMinigame : Minigame() {
                 "gooditem" -> {
                     editor.add(DropcatchItemComponent().apply { this.type = DropcatchItemType.GOOD })
                     goodItemsLeft++
-                    goodCollected++
                 }
                 "baditem" -> {
                     editor.add(DropcatchItemComponent().apply { this.type = DropcatchItemType.BAD })
-                    badCollected++
                 }
                 else -> {
                     error("Unknown dropcatch minigame type: $type")
                 }
             }
         }
+
+        infoPanel = container.table(NinePatchDrawable(table.skin.getPatch("menu-button-bg"))) {
+            it.add("Collect the items as fast as possible, while avoiding unwanted objects!", style_name)
+            it.row()
+            it.add().height(15f)
+            it.row()
+            it.table { t ->
+                t.table { inner ->
+                    inner.add("[green]Collect:[]", style_name).actor.setScale(3f)
+
+                    for (item in goodItems) {
+                        info { "$goodItems" }
+                        inner.row()
+                        inner.add(Image(item)).height(50f).width(50f * item.minWidth / item.minHeight)
+                    }
+                }
+
+                t.add().width(40f)
+
+                t.table { inner ->
+                    inner.add("[accent]Avoid:[]", style_name).actor.setScale(3f)
+
+                    for (item in badItems) {
+                        info { "$badItems" }
+                        inner.row()
+                        inner.add(Image(item)).height(50f).width(50f * item.minWidth / item.minHeight)
+                    }
+                }
+            }.center().bottom()
+        }.width(880f).height(150f).fill().actor
+
     }
 
     override fun render(camera: OrthographicCamera, batch: SpriteBatch, stage: Stage) {
         if (firstRender) {
             table.isTransform = true
             container.isTransform = true
+            table.clearActions()
             table.sequence(
                     Actions.moveTo(1920 / 2f - 150f, 1080 / 4f),
                     Actions.scaleTo(3f, 3f),
                     Actions.parallel(
-                            Actions.moveTo(1920 / 2f, table.y, 2.5f, Interpolation.pow2In),
+                            Actions.moveTo(1920 / 2f - 80f, table.y, 2.5f, Interpolation.pow2In),
                             Actions.scaleTo(1f, 1f, 2.5f, Interpolation.pow2In)
                     )
             )
-            infoPanel = container.table(NinePatchDrawable(table.skin.getPatch("menu-button-bg"))) {
-                it.add("Collect the items as fast as possible, while avoiding unwanted objects!")
-                it.row()
-                it.add().height(15f)
-                it.row()
-                it.table { t ->
-                    t.table { inner ->
-                        inner.add("[green]Collect:[]").actor.setScale(3f)
 
-                        for (item in goodItems) {
-                            info { "$goodItems" }
-                            inner.row()
-                            inner.add(Image(item)).height(50f).width(50f * item.minWidth / item.minHeight)
-                        }
-                    }
-
-                    t.add().width(40f)
-
-                    t.table { inner ->
-                        inner.add("[accent]Avoid:[]").actor.setScale(3f)
-
-                        for (item in badItems) {
-                            info { "$badItems" }
-                            inner.row()
-                            inner.add(Image(item)).height(50f).width(50f * item.minWidth / item.minHeight)
-                        }
-                    }
-                }.center().bottom()
-            }.width(880f).height(150f).fill().actor
-
+            infoPanel.clearActions()
             infoPanel.sequence(
                     Actions.fadeIn(7f),
                     Actions.fadeOut(3f),
                     Actions.hide()
             )
-
 
             firstRender = false
         }
@@ -275,11 +278,11 @@ class DropcatchMinigame : Minigame() {
                         goodItemsLeft < 10 -> "You could've gotten more."
                         else -> "Good effort! Better luck next time."
                     }
-                    it.add(response)
+                    it.add(response, style_name)
                     it.row()
-                    it.add("You collected [green]$goodCollected items[], but also [accent]$badCollected unwanted objects[]!")
+                    it.add("You collected [green]$goodCollected items[], but also [accent]$badCollected unwanted objects[]!", style_name)
                     it.row()
-                    it.add("Score: [green]${goodCollected + timeLeftVal.toInt() - badCollected}[]")
+                    it.add("Score: [green]${goodCollected - badCollected}[]", style_name)
                 }
 
                 infoPanel.sequence(

@@ -5,11 +5,11 @@ import com.artemis.ComponentMapper
 import com.artemis.annotations.All
 import com.artemis.managers.TagManager
 import com.badlogic.gdx.physics.box2d.*
-import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.ecs.component.MapTrigger
 import me.srikavin.fbla.game.ecs.component.PhysicsBody
 import me.srikavin.fbla.game.physics.ContactListenerManager
 import me.srikavin.fbla.game.trigger.TriggerManager
+import me.srikavin.fbla.game.util.EntityInt
 
 /**
  * Responsible for handling trigger
@@ -84,6 +84,7 @@ class TriggerSystem(private val listenerManager: ContactListenerManager) : BaseE
     }
 
     override fun processSystem() {
+        triggerManager.tick(world)
         collisions.forEach {
             if (triggerMapper.has(it.other)) {
                 triggerManager.handle(world, it.player, it.other, triggerMapper[it.other])

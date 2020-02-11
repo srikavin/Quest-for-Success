@@ -32,7 +32,7 @@ class DialogueManager(private val stage: Stage, skin: Skin) {
 
         private val dialogues = mapOf(
                 "meeting" to DialogueMeeting(),
-                "make_chapter" to DialogueMakeChapter(),
+                "recruit" to DialogueMakeChapter(),
                 "job_interview" to DialogueJobInterview(),
                 "office" to DialogueSpeech(),
                 "letter_rec" to DialogueLetterRec(),

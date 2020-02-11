@@ -1,9 +1,9 @@
 package me.srikavin.fbla.game.trigger
 
 import com.artemis.World
-import me.srikavin.fbla.game.EntityInt
-import me.srikavin.fbla.game.GameState
 import me.srikavin.fbla.game.ecs.component.MapTrigger
+import me.srikavin.fbla.game.state.GameState
+import me.srikavin.fbla.game.util.EntityInt
 
 /**
  * Handles triggers resulting from player collision with coins.
@@ -13,7 +13,7 @@ class CoinTriggerHandler : TriggerHandler {
         world.delete(triggerEntity)
 
         val gameState = world.getRegistered(GameState::class.java)
-        gameState.score++
+        gameState.score += gameState.gameRules.coinMultiplier
         // TODO: Play Sound
     }
 }

@@ -1,11 +1,11 @@
 package me.srikavin.fbla.game.trigger
 
 import com.artemis.World
-import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.ecs.component.MapTrigger
 import me.srikavin.fbla.game.ecs.component.MinigameComponent
 import me.srikavin.fbla.game.map.MapLoader
 import me.srikavin.fbla.game.minigame.MinigameManager
+import me.srikavin.fbla.game.util.EntityInt
 
 /**
  * Handles triggers resulting from player collision with minigame triggers.

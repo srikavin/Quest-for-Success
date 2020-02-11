@@ -91,8 +91,26 @@ class PhysicsSystem(var physicsWorld: World, private val contactManager: Contact
                     }
                 }
 
+                val filter = Filter()
+                filter.groupIndex = -1
+                fixtures.forEach {
+                    it.filterData = filter
+                }
+
 
                 if (e == world.getSystem(TagManager::class.java).getEntityId("PLAYER")) {
+                    // Increased friction when touching ground without affecting wall sliding
+                    val feet = FixtureDef().apply {
+                        //                        this.isSensor = true
+                        this.shape = PolygonShape().apply {
+                            setAsBox(0.6f, 0.05f, Vector2(0f, -1f), 0f)
+                        }
+                        friction = .9f
+                    }
+
+                    fixtures.add(physics.body.createFixture(feet))
+
+                    // Used to detect when the player is on the ground
                     val footBox = FixtureDef().apply {
                         //                        this.isSensor = true
                         this.shape = PolygonShape().apply {
@@ -103,8 +121,17 @@ class PhysicsSystem(var physicsWorld: World, private val contactManager: Contact
 
                     val fixture = physics.body.createFixture(footBox)
                     fixture.userData = player_foot_fixture_id
+                    fixture.isSensor = true
                     fixtures.add(fixture)
+
+
+                    // Apply a filter to allow for the death animation
+                    filter.groupIndex = 1
+                    fixtures.forEach {
+                        it.filterData = filter
+                    }
                 }
+
 
                 physics.fixtures = fixtures
             }

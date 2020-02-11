@@ -9,5 +9,6 @@ enum class TriggerType {
     INTERACTIVE,
     MINIGAME,
     DAMAGE,
-    TUTORIAL
+    TUTORIAL,
+    LEVEL_TITLE
 }

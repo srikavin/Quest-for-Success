@@ -7,8 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.maps.MapProperties
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import me.srikavin.fbla.game.MapTriggerDelegate
 import me.srikavin.fbla.game.map.MapLoader
+import me.srikavin.fbla.game.util.MapTriggerDelegate
 
 /**
  * The baseclass that all minigames inherit from. This class handles level transitions and communications with outside
@@ -70,14 +70,17 @@ abstract class Minigame {
      */
     fun initialize(skin: Skin, stage: Stage) {
         active = true
-
         initializeMinigame(skin, stage)
     }
 
     /**
-     * Immediately ends the minigame and transitions to the next level.
+     * Ends the minigame and transitions to the next level.
+     * If an award is to be shown, it will be shown before the next level.
      */
     fun endMinigame() {
+        if (mapProperties.properties.containsKey("award")) {
+
+        }
         active = false
         Gdx.app.postRunnable {
             mapLoader.loadMap(world, "assets/maps/$nextLevel")

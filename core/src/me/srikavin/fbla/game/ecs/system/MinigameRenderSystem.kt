@@ -14,9 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import ktx.log.info
-import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.ecs.component.MinigameComponent
-import me.srikavin.fbla.game.registerInputHandler
+import me.srikavin.fbla.game.util.EntityInt
+import me.srikavin.fbla.game.util.registerInputHandler
 
 /**
  * Handles rendering active minigames

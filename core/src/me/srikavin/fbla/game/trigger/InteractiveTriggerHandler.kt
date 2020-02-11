@@ -14,9 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import me.srikavin.fbla.game.EntityInt
 import me.srikavin.fbla.game.ecs.component.MapTrigger
 import me.srikavin.fbla.game.ecs.component.Transform
+import me.srikavin.fbla.game.util.EntityInt
 
 
 class InteractiveTriggerHandler : TriggerHandler {

@@ -5,6 +5,7 @@ import com.artemis.ComponentMapper
 import com.artemis.annotations.Wire
 import com.artemis.managers.TagManager
 import com.badlogic.gdx.graphics.OrthographicCamera
+import me.srikavin.fbla.game.ecs.component.Dead
 import me.srikavin.fbla.game.ecs.component.Transform
 
 /**
@@ -16,11 +17,17 @@ import me.srikavin.fbla.game.ecs.component.Transform
 class CameraFollowSystem(var followVertical: Boolean = true, var followHorizontal: Boolean = true) : BaseSystem() {
     @Wire
     private lateinit var transformMapper: ComponentMapper<Transform>
+    private lateinit var deadMapper: ComponentMapper<Dead>
+
     @Wire
     internal lateinit var camera: OrthographicCamera
 
     override fun processSystem() {
         val player = world.getSystem(TagManager::class.java).getEntityId("PLAYER")
+
+        if (deadMapper.has(player)) {
+            return
+        }
 
         if (player != -1 && transformMapper.has(player)) {
             val pos = transformMapper[player].position

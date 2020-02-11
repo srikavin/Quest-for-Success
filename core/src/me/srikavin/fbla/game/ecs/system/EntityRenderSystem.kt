@@ -55,7 +55,7 @@ class EntityRenderSystem : IteratingSystem() {
             switchableAnimationMapper.has(entityId) -> {
                 val animated = switchableAnimationMapper[entityId]
                 mirrored = animated.mirror
-                animated.animations[animated.currentState].getKeyFrame(stateTime, animated.looping)
+                animated.getCurrentAndUpdate(world.delta).getKeyFrame(stateTime, animated.looping)
             }
             animatedMapper.has(entityId) -> {
                 val animated = animatedMapper[entityId]
