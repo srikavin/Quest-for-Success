@@ -25,6 +25,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.ObjectMap
 import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.Viewport
 import com.strongjoshua.console.CommandExecutor
 import com.strongjoshua.console.GUIConsole
 import ktx.assets.disposeSafely
@@ -39,7 +41,6 @@ import me.srikavin.fbla.game.physics.ContactListenerManager
 import me.srikavin.fbla.game.state.GameState
 import me.srikavin.fbla.game.ui.MainMenu
 import me.srikavin.fbla.game.util.GameFonts
-import me.srikavin.fbla.game.util.SaveUtils
 import me.srikavin.fbla.game.util.registerInputHandler
 
 const val cameraScale = 45f
@@ -52,6 +53,7 @@ enum class Scene {
 
 class FBLAGame : ApplicationAdapter() {
     private lateinit var camera: OrthographicCamera
+    private lateinit var viewport: Viewport
     private lateinit var world: World
     private lateinit var batch: SpriteBatch
     private lateinit var skin: Skin
@@ -65,18 +67,16 @@ class FBLAGame : ApplicationAdapter() {
 
     override fun resize(width: Int, height: Int) {
         if (scene == PLAYING) {
-            camera.viewportHeight = cameraScale * (height.toFloat() / width)
-            camera.viewportWidth = cameraScale
-
-            camera.zoom = 1f
+            viewport.update(width, height)
             camera.update()
         } else if (scene == TITLE) {
             mainMenuUI.build()
         }
     }
 
-    private fun startGame() {
+    private fun startGame(gameState: GameState) {
         camera = OrthographicCamera(cameraScale, cameraScale * (9f / 16f))
+        viewport = FitViewport(cameraScale, cameraScale * (9f / 16f), camera)
         camera.position.x = 0f
         camera.position.y = cameraScale * (9f / 16f) * 0.75f
 
@@ -90,8 +90,6 @@ class FBLAGame : ApplicationAdapter() {
 
         root.setFillParent(true)
         root.top().right()
-
-        val gameState = GameState(0)
 
         val listenerManager = ContactListenerManager()
 
@@ -125,7 +123,7 @@ class FBLAGame : ApplicationAdapter() {
                 .register(listenerManager)
 
         world = World(config)
-        mapLoader.loadMap(world, "assets/maps/level1.tmx")
+        mapLoader.loadMap(world, gameState.currentLevelPath)
 
         console = GUIConsole()
 
@@ -195,14 +193,13 @@ class FBLAGame : ApplicationAdapter() {
     fun afterLoad() {
         skin = assetManager.get("assets/skin/skin.json")
         mainMenuUI = MainMenu(skin) {
-            startGame()
+            startGame(it)
             mainMenuUI.disposeSafely()
             scene = PLAYING
         }
         mainMenuUI.build()
         scene = TITLE
 
-        SaveUtils.saveGame(GameState(), "")
     }
 
     override fun render() {

@@ -15,9 +15,7 @@ public class DesktopLauncher {
         config.addIcon("assets/icon/QS-64.png", Files.FileType.Internal);
         config.addIcon("assets/icon/QS-32.png", Files.FileType.Internal);
         config.addIcon("assets/icon/QS-16.png", Files.FileType.Internal);
-//		config.foregroundFPS = 1000;
-//		config.vSyncEnabled = false;
-        config.fullscreen = true;
+//        config.fullscreen = true;
         new LwjglApplication(new FBLAGame(), config);
     }
 }

@@ -10,10 +10,12 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport
 import me.srikavin.fbla.game.ecs.component.Dead
 import me.srikavin.fbla.game.ext.addImageTextButton
 import me.srikavin.fbla.game.ext.table
+import me.srikavin.fbla.game.state.GameState
+import me.srikavin.fbla.game.util.SaveUtils
 import me.srikavin.fbla.game.util.registerInputHandler
 import me.srikavin.fbla.game.util.unregisterInputHandler
 
-class DeadUI(private val skin: Skin) : GameUI() {
+class DeadUI(private val skin: Skin, private val gameState: GameState) : GameUI() {
     private val stage = Stage(ExtendViewport(1920f, 1080f, 1920f, 1080f))
     private val container = Table(skin)
 
@@ -53,6 +55,7 @@ class DeadUI(private val skin: Skin) : GameUI() {
                 }, "menu")
                 inner.add().width(45f)
                 inner.addImageTextButton("[accent]Save and Quit[]", null, Runnable {
+                    SaveUtils.saveGame(gameState)
                     Gdx.app.exit()
                 }, "menu")
             }

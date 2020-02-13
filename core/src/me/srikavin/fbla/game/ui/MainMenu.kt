@@ -17,13 +17,15 @@ import ktx.actors.alpha
 import me.srikavin.fbla.game.ext.addImageTextButton
 import me.srikavin.fbla.game.ext.sequence
 import me.srikavin.fbla.game.ext.table
+import me.srikavin.fbla.game.state.GameState
 import me.srikavin.fbla.game.util.GdxArray
+import me.srikavin.fbla.game.util.SaveUtils
 import me.srikavin.fbla.game.util.registerInputHandler
 import me.srikavin.fbla.game.util.unregisterInputHandler
 
 private const val style_name = "menu"
 
-class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : GameUI() {
+class MainMenu(private val skin: Skin, private val playRunnable: (GameState) -> Unit) : GameUI() {
     private val stage = Stage(ExtendViewport(1920f, 1080f, 1920f, 1080f))
     private val container = Table(skin)
     private val cloudContainer = Table(skin)
@@ -54,7 +56,6 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : G
 
         bgStack.add(Image(
                 TextureRegionDrawable(Texture(Gdx.files.internal("assets/graphics/backgrounds/backgroundColorGrassTiled.png"))), Scaling.fill))
-//        filterStack.add(Image(NinePatchDrawable(skin.getPatch("dark-filter"))))
 
         stage.addActor(bgStack)
         stage.addActor(cloudContainer)
@@ -63,8 +64,9 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : G
         registerInputHandler(stage)
     }
 
+    var clickAgain = false
+
     fun build() {
-//        stage.isDebugAll = true
         stage.viewport.update(Gdx.graphics.width, Gdx.graphics.height)
 
         currentPanel = null
@@ -93,7 +95,6 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : G
                             Actions.moveTo(-700f, 700f + vOffset, duration)
                     ))
             )
-
         }
 
         animateCloud(cloud, 25f, 300f, 100f)
@@ -111,9 +112,30 @@ class MainMenu(private val skin: Skin, private val playRunnable: () -> Unit) : G
 
             buttons(t,
                     Buttoni("Play", null,
-                            Buttoni("New Game", null, Runnable { playRunnable() }),
-                            Buttoni("Load Game", null, Runnable { }),
-                            Buttoni("Tutorial", null, Runnable { })
+                            Buttoni("New Game", null, Runnable {
+                                if (!clickAgain && SaveUtils.saveGameExists()) {
+                                    infoPanel.clearChildren()
+                                    infoPanel.add(Label("[accent]Warning[]", skin, "default"))
+                                    infoPanel.row()
+                                    infoPanel.add("This will overwrite your previous save game!\nClick again to confirm.", style_name)
+                                    clickAgain = true
+                                } else {
+                                    playRunnable(GameState())
+                                }
+                            }),
+                            Buttoni("Load Game", null, Runnable {
+                                if (SaveUtils.saveGameExists()) {
+                                    val gameState = GameState()
+                                    SaveUtils.loadGame(gameState)
+                                    playRunnable(gameState)
+                                } else {
+                                    infoPanel.clearChildren()
+                                    infoPanel.add(Label("[accent]Warning[]", skin, "default"))
+                                    infoPanel.row()
+                                    infoPanel.add("There are no found save games!", style_name)
+                                    clickAgain = true
+                                }
+                            })
                     ),
                     Buttoni("Instructions", null, Runnable {
                         infoPanel.clearChildren()

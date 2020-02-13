@@ -23,6 +23,6 @@ object Awards {
     }
 
     fun getAward(name: String): Award {
-        return nameMap.getValue(name)
+        return nameMap.getValue(name.toLowerCase())
     }
 }

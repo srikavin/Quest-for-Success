@@ -21,13 +21,13 @@ class GameHudUI(private val skin: Skin, private val gameState: GameState) : Game
     private lateinit var scoreLabel: Label
     private lateinit var awardsTable: Table
 
+    private var awardsHashCode = -1
+
     init {
         registerInputHandler(stage)
     }
 
     fun build() {
-        stage.viewport.update(Gdx.graphics.width, Gdx.graphics.height)
-
         newAwardContainer.clear()
         newAwardContainer.setFillParent(true)
         newAwardContainer.setSize(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat())
@@ -57,7 +57,26 @@ class GameHudUI(private val skin: Skin, private val gameState: GameState) : Game
         stage.addActor(container)
     }
 
+    fun renderAwards() {
+        awardsHashCode = gameState.awards.hashCode()
+        gameState.awards.forEach { award ->
+            val drawable = award.getDrawable()
+            awardsTable.add(Image(drawable).apply {
+                        val manager = TooltipManager.getInstance()
+                        manager.maxWidth = 350f
+                        manager.instant()
+                        manager.initialTime = 0.35f
+                        addTextTooltip(award.getDescription(), skin = skin, tooltipManager = manager)
+                    })
+                    .height(100f)
+                    .width(100f * 28 / 43f)
+                    .padLeft(10f)
+        }
+    }
+
     override fun render() {
+        stage.viewport.update(Gdx.graphics.width, Gdx.graphics.height)
+
         scoreLabel.setText(gameState.score)
         livesLabel.setText(gameState.lives)
 
@@ -81,21 +100,13 @@ class GameHudUI(private val skin: Skin, private val gameState: GameState) : Game
                         Actions.fadeOut(0.75f),
                         Actions.removeActor()
                 )
-            }
 
-            gameState.awards.forEach { award ->
-                val drawable = award.getDrawable()
-                awardsTable.add(Image(drawable).apply {
-                            val manager = TooltipManager.getInstance()
-                            manager.maxWidth = 350f
-                            manager.instant()
-                            manager.initialTime = 0.35f
-                            addTextTooltip(award.getDescription(), skin = skin, tooltipManager = manager)
-                        })
-                        .height(100f)
-                        .width(100f * 28 / 43f)
-                        .padLeft(10f)
+                renderAwards()
             }
+        }
+
+        if (awardsHashCode != gameState.awards.hashCode()) {
+            renderAwards()
         }
 
         stage.act()

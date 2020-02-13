@@ -32,7 +32,7 @@ class UISystem : BaseSystem() {
         TypingConfig.DEFAULT_SPEED_PER_CHAR = 0.05f
 
         gameHudUI = GameHudUI(world.getRegistered(Skin::class.java), world.getRegistered(GameState::class.java))
-        deadUI = DeadUI(world.getRegistered(Skin::class.java))
+        deadUI = DeadUI(world.getRegistered(Skin::class.java), world.getRegistered(GameState::class.java))
 
         gameHudUI.build()
     }

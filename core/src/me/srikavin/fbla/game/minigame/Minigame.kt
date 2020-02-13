@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import me.srikavin.fbla.game.map.MapLoader
 import me.srikavin.fbla.game.state.GameState
 import me.srikavin.fbla.game.util.MapTriggerDelegate
+import me.srikavin.fbla.game.util.SaveUtils
 
 /**
  * The baseclass that all minigames inherit from. This class handles level transitions and communications with outside
@@ -98,6 +99,8 @@ abstract class Minigame {
 
         awardActive = false
         active = false
+
+        SaveUtils.saveGame(gameState)
 
         Gdx.app.postRunnable {
             mapLoader.loadMap(world, "assets/maps/$nextLevel")
