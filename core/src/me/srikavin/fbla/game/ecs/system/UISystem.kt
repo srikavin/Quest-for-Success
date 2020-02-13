@@ -4,6 +4,7 @@ import com.artemis.BaseSystem
 import com.artemis.ComponentMapper
 import com.artemis.annotations.Wire
 import com.artemis.managers.TagManager
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.rafaskoberg.gdx.typinglabel.TypingConfig
 import me.srikavin.fbla.game.ecs.component.Dead
@@ -18,7 +19,10 @@ class UISystem : BaseSystem() {
     private lateinit var gameHudUI: GameHudUI
     private lateinit var deadUI: DeadUI
 
-    var showingDead = false
+    private var showingDead = false
+
+    @Wire
+    private lateinit var stage: Stage
 
     @Wire
     private lateinit var deadMapper: ComponentMapper<Dead>
@@ -34,6 +38,8 @@ class UISystem : BaseSystem() {
     }
 
     override fun processSystem() {
+        stage.act()
+        stage.draw()
         gameHudUI.render()
 
         val player = world.getSystem(TagManager::class.java).getEntityId("PLAYER")

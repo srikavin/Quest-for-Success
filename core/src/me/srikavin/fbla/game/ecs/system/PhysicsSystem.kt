@@ -103,12 +103,22 @@ class PhysicsSystem(var physicsWorld: World, private val contactManager: Contact
                     val feet = FixtureDef().apply {
                         //                        this.isSensor = true
                         this.shape = PolygonShape().apply {
-                            setAsBox(0.6f, 0.05f, Vector2(0f, -1f), 0f)
+                            setAsBox(0.55f, 0.15f, Vector2(0f, -0.9f), 0f)
                         }
                         friction = .9f
                     }
 
                     fixtures.add(physics.body.createFixture(feet))
+
+                    val feet2 = FixtureDef().apply {
+                        //                        this.isSensor = true
+                        this.shape = PolygonShape().apply {
+                            setAsBox(0.6f, 0.05f, Vector2(0f, -1f), 0f)
+                        }
+                        friction = 0f
+                    }
+
+                    fixtures.add(physics.body.createFixture(feet2))
 
                     // Used to detect when the player is on the ground
                     val footBox = FixtureDef().apply {

@@ -39,7 +39,7 @@ class QuizMinigame : Minigame() {
         return false
     }
 
-    override fun process(delta: Float) {
+    override fun processMinigame(delta: Float) {
 
     }
 

@@ -8,8 +8,10 @@ data class GameState(
         var lives: Int = 3,
         var gameRules: GameRules = GameRules(),
         val awards: LinkedHashSet<Award> = LinkedHashSet(4),
-        var currentLevelPath: String = "level1.tmx"
-) {
+        var currentLevelPath: String = "level1.tmx") {
+    @Transient
+    var lastAddedAward: Award? = null
+
     fun addAward(name: String) {
         addAward(Awards.getAward(name))
     }
@@ -17,6 +19,7 @@ data class GameState(
     fun addAward(award: Award) {
         awards.add(award)
         award.apply(gameRules)
+        lastAddedAward = award
     }
 
     fun removeAward(name: String) {

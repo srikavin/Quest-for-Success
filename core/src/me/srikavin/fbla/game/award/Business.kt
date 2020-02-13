@@ -10,4 +10,8 @@ class Business : Award() {
     override fun getName(): String {
         return "business"
     }
+
+    override fun getDescription(): String {
+        return "You have achieved the BAA Business Award! Your focus on business has allowed you to double the value of future coins!"
+    }
 }

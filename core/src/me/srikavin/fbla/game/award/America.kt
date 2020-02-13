@@ -7,6 +7,10 @@ class America : Award() {
         gameRules.enemiesToGold = true
     }
 
+    override fun getDescription(): String {
+        return "You have achieved the BAA America Award! This marks the end of your journey and the beginning of something new!"
+    }
+
     override fun getName(): String {
         return "america"
     }

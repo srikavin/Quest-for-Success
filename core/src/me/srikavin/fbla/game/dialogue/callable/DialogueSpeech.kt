@@ -5,6 +5,7 @@ import me.srikavin.fbla.game.dialogue.DialogueCallable
 class DialogueSpeech : DialogueCallable() {
 
     override fun run() {
+        say("")
         var index = getResponse(listOf("This year I plan to grow our membership and secure more internships for everyone.", "I just need this position for this award thing."))
 
         if (index == 0) {
@@ -43,7 +44,7 @@ class DialogueSpeech : DialogueCallable() {
             say("You've won the presidency!")
         }
         if (score <= 0) {
-            say("Someone beat you out for office.")
+            say("You weren't elected chapter president.")
         }
     }
 }

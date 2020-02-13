@@ -11,7 +11,7 @@ abstract class Award {
 
     abstract fun apply(gameRules: GameRules)
 
-    protected abstract fun getName(): String
+    abstract fun getName(): String
 
     fun loadDrawable(assetManager: AssetManager) {
         val path = "assets/graphics/awards/${getName()}.png"
@@ -26,5 +26,15 @@ abstract class Award {
 
     fun getDrawable(): TextureRegionDrawable {
         return drawable
+    }
+
+    abstract fun getDescription(): String
+
+    override fun hashCode(): Int {
+        return getName().hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is Award && other.getName() == this.getName()
     }
 }

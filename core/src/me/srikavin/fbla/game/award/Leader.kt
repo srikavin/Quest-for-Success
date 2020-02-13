@@ -10,4 +10,8 @@ class Leader : Award() {
     override fun getName(): String {
         return "leader"
     }
+
+    override fun getDescription(): String {
+        return "You have achieved the BAA Leader Award! Your focus on leadership has inspired your enemies to support you, giving you coins when you meet them!"
+    }
 }

@@ -10,4 +10,8 @@ class Future : Award() {
     override fun getName(): String {
         return "future"
     }
+
+    override fun getDescription(): String {
+        return "You have achieved the BAA Future Award! Your focus on the future has allowed you to become a stronger individual, gaining new lives every step of the way!"
+    }
 }

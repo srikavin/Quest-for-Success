@@ -39,6 +39,8 @@ import me.srikavin.fbla.game.physics.ContactListenerManager
 import me.srikavin.fbla.game.state.GameState
 import me.srikavin.fbla.game.ui.MainMenu
 import me.srikavin.fbla.game.util.GameFonts
+import me.srikavin.fbla.game.util.SaveUtils
+import me.srikavin.fbla.game.util.registerInputHandler
 
 const val cameraScale = 45f
 
@@ -83,6 +85,8 @@ class FBLAGame : ApplicationAdapter() {
         val stage = Stage(ExtendViewport(1920f, 1080f))
         val root = Table(skin)
         stage.addActor(root)
+
+        registerInputHandler(stage)
 
         root.setFillParent(true)
         root.top().right()
@@ -156,7 +160,6 @@ class FBLAGame : ApplicationAdapter() {
             }
         })
         console.displayKeyID = Input.Keys.ALT_RIGHT
-
     }
 
     override fun create() {
@@ -198,6 +201,8 @@ class FBLAGame : ApplicationAdapter() {
         }
         mainMenuUI.build()
         scene = TITLE
+
+        SaveUtils.saveGame(GameState(), "")
     }
 
     override fun render() {

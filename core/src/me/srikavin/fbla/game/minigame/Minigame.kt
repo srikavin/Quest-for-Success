@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.MapProperties
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import me.srikavin.fbla.game.map.MapLoader
+import me.srikavin.fbla.game.state.GameState
 import me.srikavin.fbla.game.util.MapTriggerDelegate
 
 /**
@@ -73,15 +74,31 @@ abstract class Minigame {
         initializeMinigame(skin, stage)
     }
 
+    var awardTimer = 0f
+    var awardActive = false
+
     /**
      * Ends the minigame and transitions to the next level.
      * If an award is to be shown, it will be shown before the next level.
      */
     fun endMinigame() {
         if (mapProperties.properties.containsKey("award")) {
-
+            world.getRegistered(GameState::class.java).addAward(mapProperties.properties["award"].toString())
+            awardTimer = 10f
+            awardActive = true
+        } else {
+            exit()
         }
+    }
+
+    protected fun exit() {
+        val gameState = world.getRegistered(GameState::class.java)
+        gameState.lives += gameState.gameRules.livesGainedPerLevel
+        gameState.currentLevelPath = "assets/maps/$nextLevel"
+
+        awardActive = false
         active = false
+
         Gdx.app.postRunnable {
             mapLoader.loadMap(world, "assets/maps/$nextLevel")
         }
@@ -101,12 +118,22 @@ abstract class Minigame {
      */
     abstract fun shouldRenderBackground(): Boolean
 
+    fun process(delta: Float) {
+        if (awardTimer > 0f) {
+            awardTimer -= delta
+        } else if (awardTimer <= 0f && awardActive) {
+            exit()
+        } else {
+            this.processMinigame(delta)
+        }
+    }
+
     /**
      * Any updates to the minigame should be processed here.
      *
      * @param delta The time that has passed since the last call to this function
      */
-    abstract fun process(delta: Float)
+    abstract fun processMinigame(delta: Float)
 
     /**
      * If true, input will still affect the player. If false, the player movement cannot be affected while the minigame

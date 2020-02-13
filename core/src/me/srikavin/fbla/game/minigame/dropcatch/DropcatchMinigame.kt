@@ -266,7 +266,7 @@ class DropcatchMinigame : Minigame() {
         return !(timeLeftVal <= 0 || goodItemsLeft == 0)
     }
 
-    override fun process(delta: Float) {
+    override fun processMinigame(delta: Float) {
         if (timeLeftVal <= 0 || goodItemsLeft == 0) {
             if (!haveShownScoreboard) {
                 infoPanel.clear()
@@ -288,7 +288,7 @@ class DropcatchMinigame : Minigame() {
                 infoPanel.sequence(
                         Actions.show(),
                         Actions.fadeIn(3f),
-                        Actions.fadeIn(5f),
+                        Actions.fadeIn(2.5f),
                         Actions.fadeOut(2f),
                         Actions.hide(),
                         Actions.run {

@@ -20,8 +20,10 @@ import me.srikavin.fbla.game.ecs.component.DialogueComponent
 class DialogueSystem : BaseEntitySystem() {
     @Wire
     internal lateinit var stage: Stage
+
     @Wire
     internal lateinit var skin: Skin
+
     @Wire
     private lateinit var mapper: ComponentMapper<DialogueComponent>
 
@@ -33,6 +35,13 @@ class DialogueSystem : BaseEntitySystem() {
         getSubscription().addSubscriptionListener(SubscriptionListener())
 
         dialogueManager = DialogueManager(stage, skin)
+//        world.createEntity().edit().add(DialogueComponent().apply {
+//            val dialogueCallable = DialogueManager.getDialogueCallable("fbla_knowledge")
+//            this.channel = Channel(0)
+//            this.script = dialogueCallable
+//
+//            dialogueCallable.start(channel)
+//        })
     }
 
     private inner class SubscriptionListener : EntitySubscription.SubscriptionListener {
@@ -64,5 +73,4 @@ class DialogueSystem : BaseEntitySystem() {
     override fun processSystem() {
         dialogueManager.update()
     }
-
 }

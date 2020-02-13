@@ -30,20 +30,19 @@ class DialogueMinigame : Minigame() {
     }
 
     override fun render(camera: OrthographicCamera, batch: SpriteBatch, stage: Stage) {
-        dialogueManager.update()
-
-        if (dialogueManager.component?.finished == true) {
-            world.getRegistered(GameState::class.java).score += dialogueManager.component?.score ?: 0
-            this.endMinigame()
-        }
     }
 
     override fun shouldRenderBackground(): Boolean {
         return true
     }
 
-    override fun process(delta: Float) {
+    override fun processMinigame(delta: Float) {
+        if (dialogueManager.component?.finished == true) {
+            world.getRegistered(GameState::class.java).score += dialogueManager.component?.score ?: 0
+            dialogueManager.component = null
+            this.endMinigame()
+        }
 
+        dialogueManager.update()
     }
-
 }
