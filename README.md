@@ -3,7 +3,8 @@
 
 ## Gameplay
 
-*The Quest for Success* was designed from the ground up to be an intuitive and fun experience.
+*The Quest for Success* was designed from the ground up to be an intuitive and fun experience. It features 
+multiple puzzles and takes the player on a journey from the perspective of an FBLA member.
 
 ## Topic Correlation
 
@@ -17,14 +18,14 @@ the screen when needed. The game can be played multiple times to discover multip
 
 ## Features
 - Keyboard and mouse compatibility
-- Original art
+- A variety of original art
 - 4 separate stages, each with three levels with increasing difficulty
+- Awards with power-ups for the player
 - A variety of separate mini-games.
 - Interactive dialogue
 - Enemies, lives, coins, and an overall score system.
-- An advanced platformer with the inclusion of puzzles to solve
+- An advanced puzzle platformer
 - Instructions page included on a menu page. 
-- Multiplayer 
 
 ### Controls
 
@@ -77,8 +78,7 @@ within the source code.
 
 ![](readme_assets/tiled_1.png)
 ![](readme_assets/tiled_2.png)
-![](readme_assets/game1.png)
-![](readme_assets/game2.png)
-![](readme_assets/game3.png)
+![](readme_assets/game-menu.png)
+![](readme_assets/game-dropcatch-1.png)
 ![](readme_assets/tiled_1.png)
 ![](readme_assets/tiled_2.png)
