@@ -26,18 +26,19 @@ of the following layers:
 ## UI System
 
 The user interface of the game utilizes Scene2D. All interfaces are defined in code. Styling (called skins) are loaded 
-from the assets folder during start up.
+from the assets folder during start up. Multiple systems have different Stages that they render to, allowing
+for decoupled UI.
 
 ## Animations
 
 Animations are made within Asesprite, and are exported into a JSON format, which is then parsed to load animations from
-a spritesheet. This along with Asesprite automation allowed for faster prototyping.
+a spritesheet. This along with Asesprite automation allows for faster prototyping when developing new features.
 
 ## Minigame System
 
 The minigame system was designed to be extensible. New minigames are just a matter of extending the Minigame abstract
 class and implementing the required methods.
  
-Dialogue minigames are entirely scripted. They were implemented entirely separate of the game before being included. This
+Dialogue minigames are entirely scripted. They were implemented separately of the game before being included. This
 was possible due to the use of Kotlin blocking coroutines to create an seamless API surface to use. Dialogue coroutines
-are run in a coroutine and communicate through a series of Packets with the main thread.
+are run in a coroutine and communicate through a series of Packets with the main thread using a Channel.

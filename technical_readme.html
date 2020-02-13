@@ -1611,6 +1611,11 @@
         max-width: 100%
     }
 
+    dt {
+        font-style: italic;
+        font-weight: 600
+    }
+
     .g {
         display: block
     }
@@ -2970,10 +2975,10 @@
     }
 
     #_default_ .default-title:after {
-        content: " — "
+        content: " — "
     }
 
-    #_default_ .default-title, #_default_ .default-description {
+    #_default_ .default-title, #_default_ .default-text, #_default_ .default-description {
         display: inline
     }
 
@@ -4760,22 +4765,23 @@
     </li>
 </ul>
 <h2 class="code-line" data-line-end=26 data-line-start=25><a id="UI_System_25"></a>UI System</h2>
-<p class="has-line-data" data-line-end="29" data-line-start="27">The user interface of the game utilizes Scene2D. All
+<p class="has-line-data" data-line-end="30" data-line-start="27">The user interface of the game utilizes Scene2D. All
     interfaces are defined in code. Styling (called skins) are loaded<br>
-    from the assets folder during start up.</p>
-<h2 class="code-line" data-line-end=31 data-line-start=30><a id="Animations_30"></a>Animations</h2>
-<p class="has-line-data" data-line-end="34" data-line-start="32">Animations are made within Asesprite, and are exported
+    from the assets folder during start up. Multiple systems have different Stages that they render to, allowing<br>
+    for decoupled UI.</p>
+<h2 class="code-line" data-line-end=32 data-line-start=31><a id="Animations_31"></a>Animations</h2>
+<p class="has-line-data" data-line-end="35" data-line-start="33">Animations are made within Asesprite, and are exported
     into a JSON format, which is then parsed to load animations from<br>
-    a spritesheet. This along with Asesprite automation allowed for faster prototyping.</p>
-<h2 class="code-line" data-line-end=36 data-line-start=35><a id="Minigame_System_35"></a>Minigame System</h2>
-<p class="has-line-data" data-line-end="39" data-line-start="37">The minigame system was designed to be extensible. New
+    a spritesheet. This along with Asesprite automation allows for faster prototyping when developing new features.</p>
+<h2 class="code-line" data-line-end=37 data-line-start=36><a id="Minigame_System_36"></a>Minigame System</h2>
+<p class="has-line-data" data-line-end="40" data-line-start="38">The minigame system was designed to be extensible. New
     minigames are just a matter of extending the Minigame abstract<br>
     class and implementing the required methods.</p>
-<p class="has-line-data" data-line-end="43" data-line-start="40">Dialogue minigames are entirely scripted. They were
-    implemented entirely separate of the game before being included. This<br>
+<p class="has-line-data" data-line-end="44" data-line-start="41">Dialogue minigames are entirely scripted. They were
+    implemented separately of the game before being included. This<br>
     was possible due to the use of Kotlin blocking coroutines to create an seamless API surface to use. Dialogue
     coroutines<br>
-    are run in a coroutine and communicate through a series of Packets with the main thread.</p>
+    are run in a coroutine and communicate through a series of Packets with the main thread using a Channel.</p>
 
 </body>
 </html>
